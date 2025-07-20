@@ -129,7 +129,7 @@ int PutRec_dld(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 	int		j;
 	char	*cp;
 	char	outbuf[512];
-	uint	cksum;
+	uint32_t	cksum;
 #if 0
 	int		recbytes;
 

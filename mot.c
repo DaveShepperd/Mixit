@@ -180,7 +180,7 @@ int PutRec_mot( FILE *file, uint8_t *data, int recsize, uint32_t recstart )
 	int j;
 	char    *cp;
 	char    outbuf[512];
-	uint    cksum;
+	uint32_t    cksum;
 	int recbytes, type;
 
         if ((recstart&0xFFFF0000) == 0) type = 1;

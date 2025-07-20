@@ -150,7 +150,7 @@ int PutRec_intel(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 	int 	j;
 	char    *cp;
 	char    outbuf[512];
-	uint    cksum;
+	uint32_t    cksum;
 
 	cp  = outbuf;
 	sprintf(cp, ":%02X%04X00", recsize, recstart & 0xFFFF);

@@ -239,7 +239,7 @@ int PutSym_vlda(FILE *file, uint8_t *data, int recsize)
 int PutRec_vlda(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 {
 	register uint8_t  *bp = out_buf;
-	uint            recbytes = recsize;
+	uint32_t            recbytes = recsize;
 
 #ifndef VMS
 	recbytes += 5;

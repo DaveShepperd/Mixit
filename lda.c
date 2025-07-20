@@ -52,7 +52,7 @@
 #include <errno.h>
 
 static int	readRec(InRecord *record);
-static void	send_a_byte(int b, FILE *file, uint *cksum);
+static void	send_a_byte(int b, FILE *file, uint32_t *cksum);
 
 static int buffered_bytes;
 
@@ -225,7 +225,7 @@ int GetRec_lda(InRecord *record)
 /*==========================================================================
  * Send a byte and keep track of a checksum value.
  *==========================================================================*/
-static void send_a_byte(int b, FILE *file, uint *cksum)
+static void send_a_byte(int b, FILE *file, uint32_t *cksum)
 {
 	*cksum += (b &= 0xFF);
 	*cksum &= 0xFF;
@@ -239,9 +239,9 @@ static void send_a_byte(int b, FILE *file, uint *cksum)
  *==========================================================================*/
 int PutRec_lda(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 {
-	uint    cksum;
+	uint32_t    cksum, dummyCk;
 	int     j;
-	uint    recbytes = recsize + 6;
+	uint32_t    recbytes = recsize + 6;
 	uint8_t   rtype = 1;
 
 	cksum    = 0;
@@ -273,7 +273,7 @@ int PutRec_lda(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 
 	/* Finish with the checksum 		 */
 
-	send_a_byte(-(j = cksum), file, (uint *)&j);
+	send_a_byte(-(j = cksum), file, &dummyCk);
 	/* Keep track of buffered data for flushing at end*/
 	buffered_bytes += recbytes + 1;
 

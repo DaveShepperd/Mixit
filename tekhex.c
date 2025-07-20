@@ -178,7 +178,7 @@ int PutRec_tekhex(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 	int 	len, j;
 	char    *cp;
 	char    outbuf[140], csum[3];
-	uint    cksum;
+	uint32_t    cksum;
 
 #if 1
 	sprintf(outbuf, "%%00600%s", to_tekhex(recstart));
