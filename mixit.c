@@ -372,7 +372,7 @@ int main(int argc, char *argv[])
 	if ( optind < argc )
 		cmdFile = argv[optind];
 	if ( debug )
-		printf("Options ef=%d, noisy=%d, argc=%d, optind=%d, cmdFile=%s\n", ef, noisy, argc, optind, cmdFile ? cmdFile : "<none>" );
+		printf("Options ef=%d, noisy=%d, argc=%d, optind=%d, cmdFile=%s, NULL=%p\n", ef, noisy, argc, optind, cmdFile ? cmdFile : "<none>", NULL );
 	if ( cmdFile )
 	{
 		char *fname, extent[10];
@@ -442,7 +442,7 @@ int main(int argc, char *argv[])
 		}
 		ttp = sig(ttp + strlen(token)); /* skip the verb */
 
-		switch (lookup_token(token, "EXIT", "HELP", "INPUT", "OUTPUT", 0))
+		switch (lookup_token(token, "EXIT", "HELP", "INPUT", "OUTPUT", NULL))
 		{
 		case 0:
 			if ( *ttp == '\0' || *ttp == '!' )

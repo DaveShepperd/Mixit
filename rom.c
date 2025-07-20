@@ -248,7 +248,7 @@ static int parse_command(char *rec, RomRec *rrec)
 	i = *t;
 	*t = 0;
 	switch (lookup_token(rec, "BA", "BASE", "BSE", "SET", "WORDSIZE",
-						 "BIGENDIAN", "LITTLEENDIAN", 0))
+						 "BIGENDIAN", "LITTLEENDIAN", NULL))
 	{
 	case 0:     /* CHECK "BAA", "BAB", "BAC", "BAD", "BAE", "BAF", "BA" */
 	default:    /* DATA_COMMAND */
