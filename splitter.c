@@ -8,6 +8,10 @@
 #include <getopt.h>
 #include "formats.h"
 
+#if MINGW
+extern int fileno(FILE *stream);
+#endif
+
 typedef enum
 {
 	OPT_IN_SKIP=1,
