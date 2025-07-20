@@ -1,27 +1,27 @@
-#if 0
-===========================================================================
+#ifndef _FORMATS_H_
+#define _FORMATS_H_ (1)
 
-F O R M A T S . H
+#include <inttypes.h>
 
-	An enumerated list of known file formats.
-
-	Copyright 1989 Atari Games.  All rights reserved.
-	Author: Lyle Rains
-
-===========================================================================
+#if __SIZEOF_PTRDIFF_T__ > __SIZEOF_INT__
+	#if __SIZEOF_PTRDIFF_T__ > __SIZEOF_LONG__
+		#define FMT_PTRDIF_PRFX "ll"
+	#else
+		#define FMT_PTRDIF_PRFX "l"
+	#endif
+#else
+	#define FMT_PTRDIF_PRFX ""
+#endif
+#if __SIZEOF_SIZE_T__ > __SIZEOF_INT__
+	#if __SIZEOF_SIZE_T__ > __SIZEOF_LONG__
+		#define FMT_PRFX "ll"
+	#else
+		#define FMT_PRFX "l"
+	#endif
+#else
+	#define FMT_PRFX ""
 #endif
 
-#ifndef FORMATS_H
-#define FORMATS_H
+#define FMT_SZ FMT_PRFX
 
-#if 0			/* replaced with GPF_K_xxx enums */
-typedef enum
-{
-	UNKNOWN, VLDA, LDA, IMG, DUMP, MAC, 
-		TEKHEX, ASM68K, INTEL, MOT, DLD, ROM, DIO, COFF, ELF
-} FileFormat;
-#endif
-
-extern FileFormat   getFormat( char *fspec );
-
-#endif /* FORMATS_H */
+#endif	/* _FORMATS_H_*/

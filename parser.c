@@ -20,7 +20,7 @@ static int	qualbad(int input_parse, GPF *gpfp);
 extern char ttybuf[BUFSIZ], *ttp;   /* cmd buf & remainder ptr 				 */
 extern char token[BUFSIZ];      /* current token and its work pointer 	 */
 
-static ulong num;                   /* value found by numbad()|valbad() 	 */
+static uint32_t num;                   /* value found by numbad()|valbad() 	 */
 
 /* parsing constructs 					 */
 #define SYMNAM  "%256[A-Za-z0-9$_]"
@@ -334,7 +334,7 @@ static int outqualbad(int input_parse, GPF *gpfp)     /* slash already eaten */
 	case 0: /* FILL */
 		if ( valbad('x') )
 			return 1;
-		gpfp->fill_char = (uchar)num;
+		gpfp->fill_char = (uint8_t)num;
 		gpfp->flags |= GPF_M_FILL;
 		if ( input_parse && (outgpf.flags & GPF_M_FILL) )
 		{
@@ -383,7 +383,7 @@ static int outqualbad(int input_parse, GPF *gpfp)     /* slash already eaten */
 	case 3: /* RECORD_SIZE */
 		if ( valbad('d') )
 			return 1;
-		gpfp->rec_size = (ushort)num;
+		gpfp->rec_size = (uint16_t)num;
 		break;
 
 	case 4: /* NOSYMBOL */
@@ -401,7 +401,7 @@ static int outqualbad(int input_parse, GPF *gpfp)     /* slash already eaten */
 			return isbad("MODE and WORD_SIZE cannot both be specified in OUTPUT commands");
 
 		gpfp->flags |= GPF_M_MAU;
-		gpfp->bits_per_word = (uchar)num;
+		gpfp->bits_per_word = (uint8_t)num;
 		if ( input_parse && (outgpf.flags & GPF_M_MAU) )
 		{
 			if ( outgpf.bits_per_word == num )
@@ -457,7 +457,7 @@ static int qualbad(int input_parse, GPF *gpfp)    /* slash already eaten */
 			return 1;
 		if ( num & 7 )
 			return wasbad("GROUP must be a multiple of 8");
-		gpfp->group_code = (uchar)(num >> 3);    /* Make it a byte number */
+		gpfp->group_code = (uint8_t)(num >> 3);    /* Make it a byte number */
 		gpfp->flags |= GPF_M_GROUP;
 		break;
 
@@ -475,7 +475,7 @@ static int qualbad(int input_parse, GPF *gpfp)    /* slash already eaten */
 			return wasbad("WORD_SIZE must be a multiple of 8");
 
 		gpfp->flags |= GPF_M_MAU;
-		gpfp->bits_per_word = (uchar)num;
+		gpfp->bits_per_word = (uint8_t)num;
 		if ( input_parse && (outgpf.flags & GPF_M_MAU) )
 		{
 			if ( outgpf.bits_per_word == num )

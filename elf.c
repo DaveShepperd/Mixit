@@ -40,10 +40,10 @@ extern char* ctime();
 
 static int endian;
 
-#define FLIP2(x) flip2((uchar *)&(x))
-#define FLIP4(x) flip4((uchar *)&(x))
+#define FLIP2(x) flip2((uint8_t *)&(x))
+#define FLIP4(x) flip4((uint8_t *)&(x))
 
-static void flip2(uchar *src)
+static void flip2(uint8_t *src)
 {
 	int t;
 	t = src[1];
@@ -52,7 +52,7 @@ static void flip2(uchar *src)
 	return;
 }
 
-static void flip4(uchar *src)
+static void flip4(uint8_t *src)
 {
 	int t0, t1, t2, t3;
 	t0 = src[0];
@@ -142,7 +142,7 @@ static void flip_ph(Elf32_Phdr *nph, Elf32_Phdr *ph, int size)
 	return;
 }
 
-int GetRec_elf(GPF *gpf, InRecord *rec, LogicalAddr lo, LogicalAddr hi, long relocation)
+int GetRec_elf(GPF *gpf, InRecord *rec, LogicalAddr lo, LogicalAddr hi, int32_t  relocation)
 {
 	Elf32_Ehdr lleh, *leh = &lleh;
 	Elf32_Phdr *llph = 0, *lph;
@@ -150,8 +150,8 @@ int GetRec_elf(GPF *gpf, InRecord *rec, LogicalAddr lo, LogicalAddr hi, long rel
 /*   char name[9]; */
 	union
 	{
-		unsigned short s;
-		unsigned char c[2];
+		uint16_t s;
+		uint8_t c[2];
 	} endian_test;
 
 /*   name[8] = 0; */
@@ -247,8 +247,8 @@ int GetRec_elf(GPF *gpf, InRecord *rec, LogicalAddr lo, LogicalAddr hi, long rel
 	for ( ii = 0; ii < (int)leh->e_phnum; ++ii, ++lph )
 	{
 		LogicalAddr addr;
-		long amt;                 /* amount to read */
-		long startp;              /* address in file to reading next */
+		int32_t  amt;                 /* amount to read */
+		int32_t  startp;              /* address in file to reading next */
 
 		flip_ph(0, lph, leh->e_phentsize);
 		if ( lph->p_filesz == 0 )
@@ -273,7 +273,7 @@ int GetRec_elf(GPF *gpf, InRecord *rec, LogicalAddr lo, LogicalAddr hi, long rel
 #endif
 		if ( addr < lo )              /* we have to lop off some amount */
 		{
-			long toomuch;
+			int32_t  toomuch;
 			toomuch = lo - addr;
 			amt -= toomuch;            /* trim some off the front */
 			startp += toomuch;         /* advance the file pointer */

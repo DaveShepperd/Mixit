@@ -36,7 +36,7 @@ V L D A . C
 
 #include "mixit.h"
 
-extern uchar *out_buf;
+extern uint8_t *out_buf;
 extern int   out_bufsize;
 
 static int	readVarLen(InRecord *record);
@@ -202,9 +202,9 @@ int GetRec_vlda(InRecord *record)
 } /* end GetRec_vlda */
 
 /*==========================================================================*/
-int PutSym_vlda(FILE *file, uchar *data, int recsize)
+int PutSym_vlda(FILE *file, uint8_t *data, int recsize)
 {
-	register uchar *bp = out_buf;
+	register uint8_t *bp = out_buf;
 
 	/*
 	 *  Make sure the output buffer is big enough.
@@ -213,7 +213,7 @@ int PutSym_vlda(FILE *file, uchar *data, int recsize)
 	if ( out_bufsize < recsize + 3 )
 	{
 		free(out_buf);
-		if ( !(bp = out_buf = (uchar *)malloc(out_bufsize = recsize + 3)) )
+		if ( !(bp = out_buf = (uint8_t *)malloc(out_bufsize = recsize + 3)) )
 			return err_return(0, "Can't allocate %d bytes for symbol record",
 							  out_bufsize);
 	}
@@ -236,9 +236,9 @@ int PutSym_vlda(FILE *file, uchar *data, int recsize)
 /*==========================================================================*
  * Outputs a single record in VLDA format.
  *==========================================================================*/
-int PutRec_vlda(FILE *file, uchar *data, int recsize, ulong recstart)
+int PutRec_vlda(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 {
-	register uchar  *bp = out_buf;
+	register uint8_t  *bp = out_buf;
 	uint            recbytes = recsize;
 
 #ifndef VMS
@@ -252,7 +252,7 @@ int PutRec_vlda(FILE *file, uchar *data, int recsize, ulong recstart)
 	if ( out_bufsize < (int)recbytes )
 	{
 		free(out_buf);
-		if ( !(bp = out_buf = (uchar *)malloc(out_bufsize = recbytes)) )
+		if ( !(bp = out_buf = (uint8_t *)malloc(out_bufsize = recbytes)) )
 			return err_return(0, "Can't allocate %d bytes for data record",
 							  out_bufsize);
 	}

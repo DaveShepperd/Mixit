@@ -1,6 +1,6 @@
-# This is for a generic Linux build
+# This is for a generic Linux build but in 32 bit mode.
 
-HOST_CPU = 
+HOST_CPU = -m32
 DELIM = '
 PiOS32 = 1
 LINUX = 1
@@ -8,7 +8,7 @@ MSYS2 = 0
 MINGW = 0
 EXTRA_DEFINES = -DUSE_READLINE
 EXTRA_CHKS =
-EXTRA_LIBS = -lreadline 
+EXTRA_LIBS = -lreadline
 DBG = 
 OPT = -O2
 CC = gcc

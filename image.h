@@ -60,9 +60,9 @@ typedef struct image
 	size_t      pageSize;
 	Page        **oldPageLink;
 	Chunk       **oldChunkLink;
-	uchar       skipBytes;
-	uchar       bytesPerAddr;
-	uchar       fillChar;
+	uint8_t       skipBytes;
+	uint8_t       bytesPerAddr;
+	uint8_t       fillChar;
 } Image;
 
 
@@ -72,9 +72,9 @@ typedef struct inrecord
 	LogicalAddr	recEAddr;	/* End address of segment (inclusive) */
 	LogicalAddr recSegBase; /* segment offset for intel format (always 0 otherwise) */
 /*	int			beenConverted; */
-	uchar       *recBuf;
+	uint8_t       *recBuf;
 	size_t      recBufLen;
-	uchar       *recData;
+	uint8_t       *recData;
 	size_t      recLen;
 	size_t		recConvertedLen;
 	int    	 	recType;

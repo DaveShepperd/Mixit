@@ -31,8 +31,8 @@ extern int fileno();        /* non-ANSI */
 #endif
 
 FILE	*fout = (FILE *)NULL;
-ulong	last_address, base_address;
-uchar	*out_buf;
+uint32_t	last_address, base_address;
+uint8_t	*out_buf;
 int		out_bufsize;
 char	current_fname[80];
 
@@ -136,11 +136,11 @@ static int openOutput(const char *fname, const GPF *gpf)
  *  group_data  - Handles the /GROUP option by copying a source array to a 
  *                destination array, but only copying the GROUP'ed bytes.
  *==========================================================================*/
-static int group_data(uchar *dest, uchar *src, int count,
+static int group_data(uint8_t *dest, uint8_t *src, int count,
 					   int bytes_per_word, int group_code)
 {
 	int i;
-	uchar *dstSav = dest;
+	uint8_t *dstSav = dest;
 	
 	src += group_code;                          /* For LSB -> MSB data */
 
@@ -157,10 +157,10 @@ static int group_data(uchar *dest, uchar *src, int count,
  *  swap_data   - Handles the /SWAP option by swapping bytes in the given 
  *                array governed by bytes_per_word.
  *==========================================================================*/
-static int swap_data(uchar *dest, int count, int bytes_per_word)
+static int swap_data(uint8_t *dest, int count, int bytes_per_word)
 {
 	int i, j;
-	uchar       temp, *dstSav=dest;
+	uint8_t       temp, *dstSav=dest;
 
 	if ( count % bytes_per_word )
 	{
@@ -190,10 +190,10 @@ static int swap_data(uchar *dest, int count, int bytes_per_word)
  *		  a source array to a destination array, but only copying the
  *		  half of the words.
  *==========================================================================*/
-static int evenodd_data(uchar *dest, uchar *src, int count, short bytes_per_word, int odd)
+static int evenodd_data(uint8_t *dest, uint8_t *src, int count, int16_t bytes_per_word, int odd)
 {
 	int ii, half;
-	uchar *dstSav=dest;
+	uint8_t *dstSav=dest;
 	
 	half = bytes_per_word / 2;
 	if ( half == 0 )
@@ -221,7 +221,7 @@ static int evenodd_data(uchar *dest, uchar *src, int count, short bytes_per_word
 #endif
 
 
-static int mungBuffer(GPF *gpf, uchar *dstBuf, int bufLen, ulong inpAddr)
+static int mungBuffer(GPF *gpf, uint8_t *dstBuf, int bufLen, uint32_t inpAddr)
 {
 	/* Mung the entire input buffer according to the flags */
 	if ( (gpf->flags & (GPF_M_GROUP|GPF_M_SWAP)) )
@@ -253,20 +253,20 @@ static int mungBuffer(GPF *gpf, uchar *dstBuf, int bufLen, ulong inpAddr)
 int putfile(char *fname, GPF *gpf)
 {
 	Page	*page;
-	int		(*PutRec)(FILE *, uchar *, int, ulong) = NULL;
+	int		(*PutRec)(FILE *, uint8_t *, int, uint32_t) = NULL;
 	int		(*PutFoot)(FILE *) = NULL;
-	int		(*PutXfer)(FILE *, ulong) = NULL;
-	int		(*PutSym)(FILE *, uchar *, int) = NULL;
-	int		(*PutHead)(FILE *, ulong, ulong) = NULL;
+	int		(*PutXfer)(FILE *, uint32_t) = NULL;
+	int		(*PutSym)(FILE *, uint8_t *, int) = NULL;
+	int		(*PutHead)(FILE *, uint32_t, uint32_t) = NULL;
 	int 	status;
-	uint	rBytes;	/* Bytes per output record desired */
-	uint	rMax;
-	uchar	*buffer;
+	uint32_t	rBytes;	/* Bytes per output record desired */
+	uint32_t	rMax;
+	uint8_t	*buffer;
 	LogicalAddr	lo_range, hi_range, lo_ask, lo;
-	static	ulong		rec_count;
+	static	uint32_t		rec_count;
 	LogicalAddr inpOffset;
 	LogicalAddr outAddr;
-	uint	outLo, outHi, outCount;
+	uint32_t	outLo, outHi, outCount;
 	
 	if ( !(gpf->flags & GPF_M_APPND) )
 	{
@@ -393,7 +393,7 @@ int putfile(char *fname, GPF *gpf)
 	if ( rBytes > rMax )
 		rBytes = rMax;
 	/* Create a buffer to hold the output recs */
-	if ( (uint)out_bufsize < rMax + 20 )
+	if ( (uint32_t)out_bufsize < rMax + 20 )
 	{
 		if ( out_buf )
 			free(out_buf);
@@ -402,7 +402,7 @@ int putfile(char *fname, GPF *gpf)
 	}
 	if ( !out_buf )
 	{
-		if ( !(out_buf = (uchar *)malloc(out_bufsize = rMax + 20)) )
+		if ( !(out_buf = (uint8_t *)malloc(out_bufsize = rMax + 20)) )
 			return err_return(0, "Can't allocate %d bytes for output record", out_bufsize);
 	}
 	if ( (gpf->flags & GPF_M_EOFONLY) )     /* Output footer on EOF ONLY */
@@ -430,7 +430,7 @@ int putfile(char *fname, GPF *gpf)
 	if ( (gpf->flags & GPF_M_SYMBOL) && PutSym )
 	{
 		for ( page = gpf->image.symbolList; page; page = page->next )
-			PutSym(fout, (uchar *)page->data, page->end + 1);
+			PutSym(fout, (uint8_t *)page->data, page->end + 1);
 	}
 	/* Assume failure */
 	status = 0;
@@ -450,8 +450,9 @@ int putfile(char *fname, GPF *gpf)
 		err = readImage(gpf, buffer, rBytes, lo_ask, hi_range, &lo, &bytes);
 		if ( debug )
 		{
-			printf("putfile(): readImage(..,rBytes=%d, lo_ask=0x%lX, hi_range=0x%lX, lo=0x%lX, bytes=%d) returned %d\n",
-				   rBytes, lo_ask, hi_range, lo, bytes,
+			printf("putfile(): readImage(..,rBytes=%d, lo_ask=0x%X, hi_range=0x%X, lo=0x%X, bytes=%d) returned %d\n",
+				   rBytes,
+				   lo_ask, hi_range, lo, bytes,
 				   err);
 		}
 		if ( err == -1 )
@@ -471,8 +472,16 @@ int putfile(char *fname, GPF *gpf)
 			/* Do any required conversions of the input and return the number of bytes to output */
 			outCount = mungBuffer(gpf,buffer,bytes,inpOffset);
 			if ( debug )
-				printf("putfile(): After Mung(). Calling PutRec(). lo_ask=0x%lX, hi_range=0x%lX, low_limit=0x%lX, bytes=%d, lo=0x%lX, inpOffset=0x%lX, outAddr=0x%lX, outCount=0x%X, err=%d\n",
-					   lo_ask, hi_range, gpf->low_limit, bytes, lo, inpOffset, outAddr, outCount, err );
+				printf("putfile(): After Mung(). Calling PutRec(). lo_ask=0x%X, hi_range=0x%X, low_limit=0x%X, bytes=%d, lo=0x%X, inpOffset=0x%X, outAddr=0x%X, outCount=0x%X, err=%d\n",
+					   lo_ask,
+					   hi_range,
+					   gpf->low_limit,
+					   bytes,
+					   lo,
+					   inpOffset,
+					   outAddr,
+					   outCount,
+					   err );
 			
 			if ( PutRec(fout, buffer, outCount, outAddr) )
 			{
@@ -480,14 +489,14 @@ int putfile(char *fname, GPF *gpf)
 				if ( debug )
 				{
 					int ii;
-					printf("Output %ld: 1 %d-byte record, asked 0x%lX-0x%lX, found 0x%lX-0x%lX, output to 0x%lX-0x%lX\n\t",
+					printf("Output %d: 1 %d-byte record, asked 0x%X-0x%X, found 0x%X-0x%X, output to 0x%X-0x%X\n\t",
 						   rec_count, outCount,
 						   lo_ask, lo_ask + bytes - 1,
 						   lo, lo+bytes-1,
 						   outAddr, outAddr+outCount-1);
 					for ( ii = 0; ii < (outCount > 16 ? 16 : outCount); ++ii )
 					{
-						printf(" %02X", (unsigned char)buffer[ii]);
+						printf(" %02X", (uint8_t)buffer[ii]);
 					}
 					if ( outCount > 16 )
 						printf(" ...");
@@ -512,14 +521,14 @@ int putfile(char *fname, GPF *gpf)
 		lo_ask = (lo_ask - lo_range) / gpf->bytes_per_word + gpf->out_add;
 		hi_range = (hi_range - lo_range) / gpf->bytes_per_word + gpf->out_add;
 		if ( debug )
-			printf("putfile(): Padding file. lo_ask=0x%lX, hi_range=0x%lX (%ld bytes left), rBytes=%d, bytes_per_word=%d\n",
+			printf("putfile(): Padding file. lo_ask=0x%X, hi_range=0x%X (%d bytes left), rBytes=%d, bytes_per_word=%d\n",
 				   lo_ask, hi_range, hi_range-lo_ask+1, rBytes, gpf->bytes_per_word);
 		memset(buffer, (gpf->flags & GPF_M_FILL) ? gpf->fill_char : 0, rBytes);
 		while ( lo_ask <= hi_range )
 		{
 			int amount;
 			amount = rBytes;
-			if ( (unsigned int)amount > hi_range - lo_ask + 1 )
+			if ( (uint32_t)amount > hi_range - lo_ask + 1 )
 				amount = (int)(hi_range - lo_ask + 1);
 			if ( amount )
 			{
@@ -528,7 +537,7 @@ int putfile(char *fname, GPF *gpf)
 					++rec_count;
 					if ( debug )
 					{
-						printf("Output %ld: %d %d-byte filler record, %08lX-%08lX\n", rec_count, 1, amount, lo_ask, lo_ask + amount - 1);
+						printf("Output %d: %d %d-byte filler record, %08X-%08X\n", rec_count, 1, amount, lo_ask, lo_ask + amount - 1);
 					}
 				}
 				else

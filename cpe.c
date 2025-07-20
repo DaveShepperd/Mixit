@@ -18,7 +18,7 @@
 				the data follows immediately after the count.
 			2 = xfer address. 4 bytes, lsb first, follows immediately
 				after the type byte.
-			3 = set register n to long value v. Register number is 2 bytes,
+			3 = set register n to int32_t value v. Register number is 2 bytes,
 				lsb first, following immediately after the type byte;
 				value (v) is 4 bytes, lsb first, following immediately
 				after the register number.
@@ -53,7 +53,7 @@
 
 #include "mixit.h"
 
-static int readl(unsigned long *ans, FILE *fp)
+static int readl(uint32_t *ans, FILE *fp)
 {
 	unsigned char buf[4];
 	int sts;
@@ -66,7 +66,7 @@ static int readl(unsigned long *ans, FILE *fp)
 	return 0;
 }
 
-static int readw(unsigned long *ans, FILE *fp)
+static int readw(uint32_t *ans, FILE *fp)
 {
 	unsigned char buf[2];
 	int sts;
@@ -79,7 +79,7 @@ static int readw(unsigned long *ans, FILE *fp)
 	return 0;
 }
 
-static int read3(unsigned long *ans, FILE *fp)
+static int read3(uint32_t *ans, FILE *fp)
 {
 	unsigned char buf[3];
 	int sts;
@@ -92,7 +92,7 @@ static int read3(unsigned long *ans, FILE *fp)
 	return 0;
 }
 
-static int writel(unsigned long val, FILE *fp)
+static int writel(uint32_t val, FILE *fp)
 {
 	unsigned char buf[4];
 	int sts;
@@ -107,10 +107,10 @@ static int writel(unsigned long val, FILE *fp)
 	return 0;
 }
 
-static int writew(unsigned long val, FILE *fp)
+static int writew(uint32_t val, FILE *fp)
 {
 	unsigned char buf[2];
-	int sts;
+	size_t sts;
 
 	buf[0] = val;
 	buf[1] = val >> 8;
@@ -123,7 +123,7 @@ static int writew(unsigned long val, FILE *fp)
 /*==========================================================================*/
 static int GetHead_cpe(FILE *fp)
 {
-	uchar head[4];
+	uint8_t head[4];
 	int sts;
 
 	sts = fread(head, 1, sizeof(head), fp);
@@ -166,8 +166,8 @@ int GetRec_cpe(InRecord *record)
 		return record->recType = REC_EOF;
 	case 1:
 		{
-			unsigned long addr=0;
-			unsigned long len=0;
+			uint32_t addr=0;
+			uint32_t len=0;
 			int sts;
 			if ( readl(&addr, record->recFile) )
 				goto read_error;
@@ -178,7 +178,7 @@ int GetRec_cpe(InRecord *record)
 				record->recData = record->recBuf = realloc(record->recBuf, (size_t)len);
 				if ( !record->recBuf )
 				{
-					fprintf(errFile, "Record too long: %ld > %d. Out of memory.\n", len, (int)record->recBufLen);
+					fprintf(errFile, "Record too int32_t: %d > %" FMT_SZ "d. Out of memory.\n", len, record->recBufLen);
 					record->recBufLen = 0;
 					return record->recType = REC_ERR;
 				}
@@ -201,7 +201,7 @@ int GetRec_cpe(InRecord *record)
 		return record->recType = REC_XFER;
 	case 3:
 		{
-			ulong reg=0;
+			uint32_t reg=0;
 			if ( readw(&reg, record->recFile) )
 				goto read_error;
 			if ( readl(&record->recSAddr, record->recFile) )
@@ -254,9 +254,9 @@ int GetRec_cpe(InRecord *record)
 /*==========================================================================*
  * Outputs a single record in CPE format.
  *==========================================================================*/
-int PutRec_cpe(FILE *file, uchar *data, int recsize, ulong recstart)
+int PutRec_cpe(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 {
-	uchar	maddr[4];
+	uint8_t	maddr[4];
 
 	maddr[0] = recstart;
 	maddr[1] = recstart >> 8;
@@ -280,7 +280,7 @@ int PutRec_cpe(FILE *file, uchar *data, int recsize, ulong recstart)
 /*==========================================================================*
  * Outputs all header information required by a CPE format file.
  *==========================================================================*/
-int PutHead_cpe(FILE *file, ulong addr, ulong hi)
+int PutHead_cpe(FILE *file, uint32_t addr, uint32_t hi)
 {
 	fwrite("CPE\001", 1, 4, file);
 	fwrite("\010\000", 1, 2, file); /* set unit number to 0 */
@@ -290,7 +290,7 @@ int PutHead_cpe(FILE *file, ulong addr, ulong hi)
 /*==========================================================================*
  * Outputs transfer address
  *==========================================================================*/
-int PutXfer_cpe(FILE *file, ulong addr)
+int PutXfer_cpe(FILE *file, uint32_t addr)
 {
 	fputc(3, file);         /* set register */
 	writew(144, file);      /* 144 to */

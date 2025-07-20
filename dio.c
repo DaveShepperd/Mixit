@@ -55,28 +55,28 @@
 	#define	SEEK_END	2	/* Set file pointer to EOF plus "offset" */
 #endif
 
-extern uchar	*out_buf;
+extern uint8_t	*out_buf;
 extern int	out_bufsize;
 
-static uchar	buffer[512];
-static ushort	bufIndex;
-static ulong	checkSum;
-static ulong	amtWritten, amtToWrite;
+static uint8_t	buffer[512];
+static uint16_t	bufIndex;
+static uint32_t	checkSum;
+static uint32_t	amtWritten, amtToWrite;
 #if 0
-static uchar	zeroes[512];
+static uint8_t	zeroes[512];
 extern GPF	*gpf;
 #endif
 
 /*==========================================================================*/
 int GetRec_dio(InRecord *rec)
 {
-	uchar *bp;
-	static ushort	file_cksum = 0;
-	static ushort	checksum = 0;
-	static long		byteCount = 0;
+	uint8_t *bp;
+	static uint16_t	file_cksum = 0;
+	static uint16_t	checksum = 0;
+	static int32_t		byteCount = 0;
 	size_t			len, lclRecLen, dataSize;
 	int				i;
-	uchar			byte, arrow[5],
+	uint8_t			byte, arrow[5],
 		a16[] = { 0x1C, 0x2A, 0x49, 0x08, 0x00 },
 		a32[] = { 0x1C, 0x3E, 0x6B, 0x08, 0x00 },
 		count[9];
@@ -201,10 +201,10 @@ problem:
 /*==========================================================================*
  * Outputs a single record in DIO format.
  *==========================================================================*/
-int PutRec_dio(FILE *file, uchar *data, int recsize, ulong recstart)
+int PutRec_dio(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 {
 	int	i;
-	uchar *bp;
+	uint8_t *bp;
 
 #if defined(VMS)
 	int     amount;
@@ -259,7 +259,7 @@ int PutRec_dio(FILE *file, uchar *data, int recsize, ulong recstart)
 	else
 	{
 		char emsg[132];
-		sprintf(emsg, "ERROR: Not allowed to backpatch a .DIO file (%08lX-%08lX)\n",
+		sprintf(emsg, "ERROR: Not allowed to backpatch a .DIO file (%08X-%08X)\n",
 				recstart, recstart + recsize - 1);
 		return perr_return(0, emsg);
 	}
@@ -275,7 +275,7 @@ int PutRec_dio(FILE *file, uchar *data, int recsize, ulong recstart)
 /*==========================================================================
  * Puts out any header info for the file.
  *==========================================================================*/
-int PutHead_dio(FILE *file, ulong addr, ulong hi)
+int PutHead_dio(FILE *file, uint32_t addr, uint32_t hi)
 {
 
 	amtToWrite = hi - addr + 1;
@@ -297,7 +297,7 @@ int PutHead_dio(FILE *file, ulong addr, ulong hi)
  *==========================================================================*/
 int PutFoot_dio(FILE *file)
 {
-	uchar csbuf[4], *bp;
+	uint8_t csbuf[4], *bp;
 	int sts;
 
 #if defined(VMS)
@@ -339,14 +339,14 @@ int PutFoot_dio(FILE *file)
 	*bp++ = 0x6B;
 	*bp++ = 0x08;
 	*bp++ = 0x00;
-	*bp++ = (uchar)((amtWritten >> 28) & 15);
-	*bp++ = (uchar)((amtWritten >> 24) & 15);
-	*bp++ = (uchar)((amtWritten >> 20) & 15);
-	*bp++ = (uchar)((amtWritten >> 16) & 15);
-	*bp++ = (uchar)((amtWritten >> 12) & 15);
-	*bp++ = (uchar)((amtWritten >>  8) & 15);
-	*bp++ = (uchar)((amtWritten >>  4) & 15);
-	*bp++ = (uchar)((amtWritten >>  0) & 15);
+	*bp++ = (uint8_t)((amtWritten >> 28) & 15);
+	*bp++ = (uint8_t)((amtWritten >> 24) & 15);
+	*bp++ = (uint8_t)((amtWritten >> 20) & 15);
+	*bp++ = (uint8_t)((amtWritten >> 16) & 15);
+	*bp++ = (uint8_t)((amtWritten >> 12) & 15);
+	*bp++ = (uint8_t)((amtWritten >>  8) & 15);
+	*bp++ = (uint8_t)((amtWritten >>  4) & 15);
+	*bp++ = (uint8_t)((amtWritten >>  0) & 15);
 	*bp++ = 0xFF;
 /* fprintf(errFile, "Wrote a %d (%08lX) byte dio file\n", amtWritten, amtWritten); */
 	if ( fseek(file, 0, SEEK_SET) < 0 )

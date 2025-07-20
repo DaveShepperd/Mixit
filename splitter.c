@@ -6,9 +6,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <getopt.h>
-
-typedef unsigned long U32;
-typedef unsigned short U16;
+#include "formats.h"
 
 typedef enum
 {
@@ -35,7 +33,7 @@ static struct option long_options[] = {
    {NULL,		0,					0,	0 }
 };
 
-unsigned char buff[8192];
+uint8_t buff[8192];
 
 static int help_em(const char *name)
 {
@@ -75,7 +73,7 @@ static int help_em(const char *name)
 
 int main(int argc, char *argv[])
 {
-	U32 inSkip=0, outSkip=0, skipInAmt, skipOutAmt;
+	uint32_t inSkip=0, outSkip=0, skipInAmt, skipOutAmt;
 	int opt, byteSkip=1, totalOutCount=0, outWritten=0;
 	int fillChr=0, option_index;
 	int len, limit, ifd, ofd;
@@ -205,7 +203,7 @@ int main(int argc, char *argv[])
 		}
 		else if ( len == 0 )
 		{
-			fprintf(stderr,"Reached EOF on input before inaddr 0x%lX\n", inSkip);
+			fprintf(stderr,"Reached EOF on input before inaddr 0x%X\n", inSkip);
 			return 1;
 		}
 		skipInAmt -= len;
@@ -242,7 +240,7 @@ int main(int argc, char *argv[])
 		if ( byteSkip != 1 )
 		{
 			int ii;
-			unsigned char *src,*dst;
+			uint8_t *src,*dst;
 			src = buff;
 			dst = buff;
 			for (ii=0; ii < len; )

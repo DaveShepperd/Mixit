@@ -121,7 +121,7 @@ static void outcmd(void)
 /*==========================================================================*/
 static void incmd(void)
 {
-	long relocation;
+	int32_t relocation;
 	char savec = inspec[0];         /* save former flag 					 */
 
 	if ( ioparsebad(1, initgpf(&ingpf)) )
@@ -207,7 +207,7 @@ static void incmd(void)
 	ingpf.high_limit += relocation;
 	if ( debug )
 	{
-		printf("incmd(): calling putfile(). relocation=0x%lX, low_add=0x%lX, hi_add=0x%lX, lo_lim=0xx%lX, hi_lim=0x%lX\n",
+		printf("incmd(): calling putfile(). relocation=0x%X, low_add=0x%X, hi_add=0x%X, lo_lim=0xx%X, hi_lim=0x%X\n",
 			   relocation, ingpf.low_add, ingpf.high_add, ingpf.low_limit, ingpf.high_limit );
 	}
 	/* note using INPUT gpf */
@@ -350,7 +350,7 @@ int main(int argc, char *argv[])
 	if ( testHStr )
 	{
 		int sts = strlen(testHStr);
-		uchar tmpBuf[64];
+		uint8_t tmpBuf[64];
 		if ( sts > (int)sizeof(tmpBuf) )
 			sts = sizeof(tmpBuf);
 		memcpy(tmpBuf, testHStr, sts);
@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
 	if ( testNStr )
 	{
 		int sts = strlen(testNStr);
-		uchar tmpBuf[64];
+		uint8_t tmpBuf[64];
 		if ( sts > (int)sizeof(tmpBuf) )
 			sts = sizeof(tmpBuf);
 		memcpy(tmpBuf, testNStr, sts);
@@ -399,7 +399,7 @@ int main(int argc, char *argv[])
 	inspec[0] = outspec[0] = '\0';  /* no data files open yet */
 
 	if ( fin == 0 || noisy )
-		printf("Mixit version %s. Copyright Atari Games Corp. 1996-1998\n", REVISION);
+		printf("Mixit version %s (%" FMT_SZ "d bit). Copyright Atari Games Corp. 1996-1998\n", REVISION, sizeof(void *)*8);
 
 	while ( 1 )
 	{

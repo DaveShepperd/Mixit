@@ -13,6 +13,9 @@
 #include <unistd.h>
 #endif
 
+#include "formats.h"
+
+#if 0
 #if IRIX
 #include <sys/bsd_types.h>
 #else
@@ -54,6 +57,11 @@ typedef unsigned int		uint;
 #endif
 typedef unsigned char  		uchar;
 typedef unsigned long		LogicalAddr;
+#else
+
+typedef uint32_t		LogicalAddr;
+
+#endif
 
 extern int noisy;
 extern int debug;
@@ -69,7 +77,7 @@ extern FILE *errFile;
 
 #define in(l,m,h)   			( ((l) <= (m))  &&  ((m) <= (h)))
 #define byte_of(x) 				( (x) & 0xFF )
-#define PUT_BUF( ptr, byte )    ( *ptr++ = (uchar)byte )
+#define PUT_BUF( ptr, byte )    ( *ptr++ = (uint8_t)byte )
 
 #include "port.h"
 #include "image.h"

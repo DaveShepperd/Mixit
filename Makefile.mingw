@@ -1,7 +1,6 @@
-# This is for a MinGW-32 system running on Windows. Only been checked on a Windows 10 system.
-# For now, macxx has to be built to run in 32 bit mode.
+# This is for a MinGW system running on Windows. It should build ok on 32 or 64 bit. Only been checked on a MinGW-32 on Windows 11 system.
 
-HOST_CPU = -m32
+HOST_CPU = 
 DELIM = ^
 PiOS32 = 1
 LINUX = 0

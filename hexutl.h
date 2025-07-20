@@ -25,13 +25,13 @@ H E X U T L . H
 
 #define XX 0x7F
 
-extern uchar chartohex[256];
-extern uchar hex_of[16];
+extern uint8_t chartohex[256];
+extern uint8_t hex_of[16];
 
-int			strtobytes(uchar *str, int nbytes);
-int			strtohex(uchar *str, int nchars);
-void		hextobytes(uchar *hexstr, int nbytes);
-LogicalAddr bytestoaddr(uchar *bytestr, int nbytes);
-LogicalAddr hextoaddr(uchar *hexstr, int nnybbles);
+int			strtobytes(uint8_t *str, int nbytes);
+int			strtohex(uint8_t *str, int nchars);
+void		hextobytes(uint8_t *hexstr, int nbytes);
+LogicalAddr bytestoaddr(uint8_t *bytestr, int nbytes);
+LogicalAddr hextoaddr(uint8_t *hexstr, int nnybbles);
 
 #endif /* HEXUTL_H */

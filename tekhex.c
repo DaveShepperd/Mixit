@@ -36,15 +36,15 @@ T E K H E X . C
 
 #define BYTES_PER_REC   32
 
-static char* to_tekhex(ulong number);
+static char* to_tekhex(uint32_t number);
 
 /*==========================================================================*/
 int GetRec_tekhex(InRecord *rec)
 {
 	int 	cnt, chk, c;
-	uchar    *token;
-	uchar    *inbuf;
-	uchar    *bufend;
+	uint8_t    *token;
+	uint8_t    *inbuf;
+	uint8_t    *bufend;
 	char    tmp[4];                     /* for count/type fields 			 */
 
 	do
@@ -137,13 +137,13 @@ int GetRec_tekhex(InRecord *rec)
 /*==========================================================================
  * Converts a binary number into variable length hex format.
  *==========================================================================*/
-static char* to_tekhex(ulong number)
+static char* to_tekhex(uint32_t number)
 {
 	static char str[18];
 	static char hex_len[] = { '0', '1', '2', '3', '4', '5', '6', '7',
 		'8', '9', 'A', 'B', 'C', 'D', 'E', '0' };
 	int len;
-	sprintf(&str[1], "%lX", number);
+	sprintf(&str[1], "%X", number);
 	len = strlen(str + 1);
 	str[0] = hex_len[len];
 	return str;
@@ -163,7 +163,7 @@ int PutFoot_tekhex(FILE *file)
 /*==========================================================================*
  * Outputs a symbol pointed to by data to 'file'.
  *==========================================================================*/
-int PutSym_tekhex(FILE *file, uchar *data, int recsize)
+int PutSym_tekhex(FILE *file, uint8_t *data, int recsize)
 {
 	fputs((char *)data, file);
 	return recsize != 0;
@@ -173,7 +173,7 @@ int PutSym_tekhex(FILE *file, uchar *data, int recsize)
 /*==========================================================================*
  * Outputs a single record in TEKHEX format.
  *==========================================================================*/
-int PutRec_tekhex(FILE *file, uchar *data, int recsize, ulong recstart)
+int PutRec_tekhex(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 {
 	int 	len, j;
 	char    *cp;
@@ -192,7 +192,7 @@ int PutRec_tekhex(FILE *file, uchar *data, int recsize, ulong recstart)
 	*cp++ = '\n';                       /* Add a line terminator 			 */
 	*cp   = 0;
 	/* Calculate the length 			 */
-	to_hex((uchar)((cp - outbuf - 2) & 0xFF), csum);
+	to_hex((uint8_t)((cp - outbuf - 2) & 0xFF), csum);
 	outbuf[1] = csum[0];
 	outbuf[2] = csum[1];
 	/* Calculate the checksum 			 */
@@ -221,7 +221,7 @@ int PutRec_tekhex(FILE *file, uchar *data, int recsize, ulong recstart)
 				break;
 			}
 	}
-	to_hex((uchar)(cksum & 0xFF), csum);      /* Insert the checksum 				 */
+	to_hex((uint8_t)(cksum & 0xFF), csum);      /* Insert the checksum 				 */
 	outbuf[4] = csum[0];
 	outbuf[5] = csum[1];
 	fputs(outbuf, file);                /* Output the record to the file 	 */

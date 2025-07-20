@@ -237,12 +237,12 @@ static void send_a_byte(int b, FILE *file, uint *cksum)
 /*==========================================================================*
  * Outputs a single record in LDA format.
  *==========================================================================*/
-int PutRec_lda(FILE *file, uchar *data, int recsize, ulong recstart)
+int PutRec_lda(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 {
 	uint    cksum;
 	int     j;
 	uint    recbytes = recsize + 6;
-	uchar   rtype = 1;
+	uint8_t   rtype = 1;
 
 	cksum    = 0;
 
@@ -288,7 +288,7 @@ int PutRec_lda(FILE *file, uchar *data, int recsize, ulong recstart)
 int PutFoot_lda(FILE *file)
 {
 	int     rv;
-	uchar   data[1];
+	uint8_t   data[1];
 
 	rv = PutRec_lda(file, data, 0, 0L);
 

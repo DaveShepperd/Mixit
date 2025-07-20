@@ -101,7 +101,7 @@ static void flip_sec(SCNHDR *sec, SecHdr *nsec)
 	return;
 }
 
-int GetRec_coff(GPF *gpf, InRecord *rec, LogicalAddr lo, LogicalAddr hi, long relocation)
+int GetRec_coff(GPF *gpf, InRecord *rec, LogicalAddr lo, LogicalAddr hi, int32_t relocation)
 {
 	FILHDR *ch;          /* ptr to external section struct */
 	FileHdr *lch;        /* ptr to internal section struct */
@@ -113,7 +113,7 @@ int GetRec_coff(GPF *gpf, InRecord *rec, LogicalAddr lo, LogicalAddr hi, long re
 		FileHdr lfh;
 		SCNHDR *esec;     /* ptr to array of external section structs */
 		SecHdr lsec;      /* local section struct */
-		ulong remaining;
+		uint32_t remaining;
 		int secindx;
 	} Coff;
 	Coff *coff;
@@ -124,7 +124,7 @@ int GetRec_coff(GPF *gpf, InRecord *rec, LogicalAddr lo, LogicalAddr hi, long re
 	coff = (Coff *)calloc(sizeof(Coff) + sizeof(FILHDR), 1);
 	if ( coff == 0 )
 	{
-		fprintf(errFile, "Out of memory allocating %d bytes in GetRec_coff\n",
+		fprintf(errFile, "Out of memory allocating %" FMT_SZ "d bytes in GetRec_coff\n",
 				sizeof(Coff) + sizeof(FILHDR));
 		return 0;
 	}
@@ -194,8 +194,8 @@ int GetRec_coff(GPF *gpf, InRecord *rec, LogicalAddr lo, LogicalAddr hi, long re
 	for ( ii = 0; (unsigned short)ii < lch->f_nscns; ++ii )
 	{
 		LogicalAddr addr;
-		long amt;                 /* amount to read */
-		long startp;              /* address in file to reading next */
+		int32_t amt;                 /* amount to read */
+		int32_t startp;              /* address in file to reading next */
 
 		flip_sec(esec + ii, lsec);
 #if 0
@@ -224,7 +224,7 @@ int GetRec_coff(GPF *gpf, InRecord *rec, LogicalAddr lo, LogicalAddr hi, long re
 #endif
 		if ( addr < lo )              /* we have to lop off some amount */
 		{
-			long toomuch;
+			int32_t toomuch;
 			toomuch = lo - addr;
 			amt -= toomuch;            /* trim some off the front */
 			startp += toomuch;         /* advance the file pointer */

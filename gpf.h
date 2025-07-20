@@ -57,35 +57,35 @@ typedef enum FILE_TYPES
  */
 
 typedef struct gpf {
-	uchar   bits_per_word;  /* number of bits per target word */
-	uchar   bytes_per_word;  /* number of bits per target word */
-	uchar   group_code;     /* group number */
-	long    array_size;     /* size of data array */
-	ulong   flags;          /* flag storage */
-	Image   image;          /* root of target tree if any exists */
-	ulong   low_add;        /* lowest address found in file */
-	ulong   high_add;       /* highest address found in file */
-	ulong   xfer_add;       /* xfer address found in the file */
-	ulong	low_limit;		/* lowest address to look for (from command line) */
-	ulong	high_limit;		/* highest address to look for (from command line) */
-	ulong   out_add;        /* output file address (from command line) */
-	ushort  rec_size;       /* default output record size */
-	uchar   fill_char;      /* value to fill uninit'd bytes */
-	FileFormat rec_type;    /* file format */
-	ulong   sym_add;        /* symbol table address? */
-	ulong   sym_end;        /* symbol table end? */
-	int		recordNumber;	/* record number on files that have records */
-	ulong	recordOffset;	/* Offset in input file of start of record (not all formats update this) */
-	int		reportedSkippedBytes; /* Unique flag for lda input */
-} GPF;                  /* this whole structure is now a GPF */
+	uint8_t   bits_per_word;   /* number of bits per target word */
+	uint8_t   bytes_per_word;  /* number of bits per target word */
+	uint8_t   group_code;      /* group number */
+	int32_t   array_size;      /* size of data array */
+	uint32_t  flags;           /* flag storage */
+	Image     image;           /* root of target tree if any exists */
+	uint32_t  low_add;         /* lowest address found in file */
+	uint32_t  high_add;        /* highest address found in file */
+	uint32_t  xfer_add;        /* xfer address found in the file */
+	uint32_t  low_limit;	   /* lowest address to look for (from command line) */
+	uint32_t  high_limit;	   /* highest address to look for (from command line) */
+	uint32_t  out_add;         /* output file address (from command line) */
+	uint16_t  rec_size;        /* default output record size */
+	uint8_t   fill_char;       /* value to fill uninit'd bytes */
+	FileFormat rec_type;       /* file format */
+	uint32_t  sym_add;         /* symbol table address? */
+	uint32_t  sym_end;         /* symbol table end? */
+	int       recordNumber;    /* record number on files that have records */
+	uint32_t  recordOffset;    /* Offset in input file of start of record (not all formats update this) */
+	int       reportedSkippedBytes; /* Unique flag for lda input */
+} GPF;                         /* this whole structure is now a GPF */
 
 extern GPF ingpf, outgpf;
 
 extern int getfile(char *filespec, GPF *gpf);
 extern int putfile(char *filespec, GPF *gpf);
 extern int init_reader(GPF *gpf);
-extern int readImage(GPF *gpf, uchar *bufferPtr, ulong bufferSpace,
-					 ulong low_address, ulong high_address, ulong *new_low,
+extern int readImage(GPF *gpf, uint8_t *bufferPtr, uint32_t bufferSpace,
+					 uint32_t low_address, uint32_t high_address, uint32_t *new_low,
 					 int *bytesRead);
 extern int ioparsebad(int input_parse, GPF *gpfp);
 
