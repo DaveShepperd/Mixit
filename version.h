@@ -18,6 +18,6 @@
 #ifndef _VERSION_H_
 #define _VERSION_H_ (1)
 
-#define REVISION "V3.00"		/* MIXIT version number */
+#define REVISION "V3.01"		/* MIXIT version number */
 
 #endif	/* _VERSION_H_ */

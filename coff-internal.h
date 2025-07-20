@@ -1,3 +1,7 @@
+#ifndef _COFF_INTERNAL_H_
+#define _COFF_INTERNAL_H_ (1)
+
+#include "formats.h"
 /* Bits for f_flags:
  *	F_RELFLG	relocation info stripped from file
  *	F_EXEC		file is executable (no unresolved external references)
@@ -292,68 +296,68 @@
 #define R_SH_PCRELIMM8BY4   23
 
 typedef struct {
-	ushort f_magic;		/* magic number			*/
-	ushort f_nscns;		/* number of sections		*/
-	ulong  f_timdat;	/* time & date stamp		*/
-	ulong  f_symptr;	/* file pointer to symtab	*/
-	ulong  f_nsyms;		/* number of symtab entries	*/
-	ushort f_opthdr;	/* sizeof(optional hdr)		*/
-	ushort f_flags;		/* flags			*/
+	uint16_t f_magic;		/* magic number			*/
+	uint16_t f_nscns;		/* number of sections		*/
+	uint32_t  f_timdat;	/* time & date stamp		*/
+	uint32_t  f_symptr;	/* file pointer to symtab	*/
+	uint32_t  f_nsyms;		/* number of symtab entries	*/
+	uint16_t f_opthdr;	/* sizeof(optional hdr)		*/
+	uint16_t f_flags;		/* flags			*/
 } FileHdr;
 
 typedef struct {
-  	ushort magic;		/* type of file				*/
-   	ushort vstamp;		/* version stamp			*/
-   	ulong tsize;		/* text size in bytes, padded to FW bdry*/
-   	ulong dsize;		/* initialized data "  "		*/
-   	ulong bsize;		/* uninitialized data "   "		*/
-   	ulong entry;		/* entry pt.				*/
-   	ulong text_start;	/* base of text used for this file */
-   	ulong data_start;	/* base of data used for this file */
+  	uint16_t magic;		/* type of file				*/
+   	uint16_t vstamp;		/* version stamp			*/
+   	uint32_t tsize;		/* text size in bytes, padded to FW bdry*/
+   	uint32_t dsize;		/* initialized data "  "		*/
+   	uint32_t bsize;		/* uninitialized data "   "		*/
+   	uint32_t entry;		/* entry pt.				*/
+   	uint32_t text_start;	/* base of text used for this file */
+   	uint32_t data_start;	/* base of data used for this file */
 } AoutHdr;
 
 typedef struct {
 	char		s_name[8];	/* section name			*/
-	ulong 		s_paddr;	/* physical address, aliased s_nlib */
-	ulong		s_vaddr;	/* virtual address		*/
-	ulong		s_size;		/* section size			*/
-	ulong		s_scnptr;	/* file ptr to raw data for section */
-	ulong		s_relptr;	/* file ptr to relocation	*/
-	ulong		s_lnnoptr;	/* file ptr to line numbers	*/
-	ushort		s_nreloc;	/* number of relocation entries	*/
-	ushort		s_nlnno;	/* number of line number entries*/
-	ulong		s_flags;	/* flags			*/
+	uint32_t 		s_paddr;	/* physical address, aliased s_nlib */
+	uint32_t		s_vaddr;	/* virtual address		*/
+	uint32_t		s_size;		/* section size			*/
+	uint32_t		s_scnptr;	/* file ptr to raw data for section */
+	uint32_t		s_relptr;	/* file ptr to relocation	*/
+	uint32_t		s_lnnoptr;	/* file ptr to line numbers	*/
+	uint16_t		s_nreloc;	/* number of relocation entries	*/
+	uint16_t		s_nlnno;	/* number of line number entries*/
+	uint32_t		s_flags;	/* flags			*/
 } SecHdr;
 
 typedef struct {
 	union {
-		ulong l_symndx[4];	/* function name symbol index, iff l_lnno == 0*/
-		ulong l_paddr[4];	/* (physical) address of line number	*/
+		uint32_t l_symndx[4];	/* function name symbol index, iff l_lnno == 0*/
+		uint32_t l_paddr[4];	/* (physical) address of line number	*/
 	} l_addr;
-	ushort l_lnno[2];	/* line number		*/
+	uint16_t l_lnno[2];	/* line number		*/
 } LineNo;
 
 typedef struct {
   union {
     char e_name[E_SYMNMLEN];
     struct {
-       ulong e_zeroes;
-       ulong e_offset;
+       uint32_t e_zeroes;
+       uint32_t e_offset;
     } e;
   } e;
-  ulong  e_value;
-  ushort e_scnum;
-  ushort e_type;
+  uint32_t  e_value;
+  uint16_t e_scnum;
+  uint16_t e_type;
   char e_sclass;
   char e_numaux;
 } SymEnt;
 
 typedef struct {
-  ulong r_vaddr;
-  ulong r_symndx;
-  ushort r_type;
+  uint32_t r_vaddr;
+  uint32_t r_symndx;
+  uint16_t r_type;
 #ifdef M68K_COFF_OFFSET
-  ulong r_offset;
+  uint32_t r_offset;
 #endif
 } RelocEnt;
 
@@ -370,3 +374,6 @@ typedef struct {
    			         (((src)[1]&0xFF) <<  8) |  ((src)[0]&0xFF))
 #define UNPACK2(src) (endian ?   (((src)[0]&0xFF) <<  8) |  ((src)[1]&0xFF) : \
                                  (((src)[1]&0xFF) <<  8) |  ((src)[0]&0xFF))
+								 
+#endif  /* ifndef _COFF_INTERNAL_H_ */
+

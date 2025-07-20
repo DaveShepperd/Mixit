@@ -15,53 +15,7 @@
 
 #include "formats.h"
 
-#if 0
-#if IRIX
-#include <sys/bsd_types.h>
-#else
-#  if sun || __i386
-#    include <sys/types.h>
-#    ifdef __USE_MISC
-#      define _TYPEDEF_USHORT (1)
-#      define _TYPEDEF_UINT   (1)
-#      define _TYPEDEF_ULONG  (1)
-#    endif
-#    if !_TYPEDEF_ULONG
-#      define _TYPEDEF_ULONG (1)
-typedef unsigned long		ulong;
-#    endif
-#    if !_TYPEDEF_USHORT
-#      define _TYPEDEF_USHORT (1)
-typedef unsigned short		ushort;
-#    endif
-#    if !_TYPEDEF_UINT
-#      define _TYPEDEF_UINT	(1)
-typedef unsigned int		uint;
-#    endif
-#  endif
-#endif
-
-#if LINUX
-# if !_TYPEDEF_ULONG
-#   define _TYPEDEF_ULONG (1)
-typedef unsigned long		ulong;
-# endif
-# if !_TYPEDEF_USHORT
-#  define _TYPEDEF_USHORT (1)
-typedef unsigned short		ushort;
-# endif
-# if !_TYPEDEF_UINT
-#  define _TYPEDEF_UINT	(1)
-typedef unsigned int		uint;
-# endif
-#endif
-typedef unsigned char  		uchar;
-typedef unsigned long		LogicalAddr;
-#else
-
 typedef uint32_t		LogicalAddr;
-
-#endif
 
 extern int noisy;
 extern int debug;

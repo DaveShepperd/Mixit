@@ -398,8 +398,16 @@ int main(int argc, char *argv[])
 
 	inspec[0] = outspec[0] = '\0';  /* no data files open yet */
 
+#if !USE_READLINE
+#define RDLINE_MSG "; Without readline"
+#else
+#define RDLINE_MSG "; With readline+history"
+#endif
 	if ( fin == 0 || noisy )
-		printf("Mixit version %s (%" FMT_SZ "d bit). Copyright Atari Games Corp. 1996-1998\n", REVISION, sizeof(void *)*8);
+		printf("Mixit version %s (%" FMT_SZ "d bit" RDLINE_MSG "). Copyright Atari Games Corp. 1996-1998\n"
+			   ,REVISION
+			   ,sizeof(void *)*8
+			   );
 
 	while ( 1 )
 	{
