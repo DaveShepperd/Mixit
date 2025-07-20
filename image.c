@@ -203,7 +203,7 @@ static Page* newPage(Image *image, LogicalAddr addr, Page **insertlink)
 		 *  Oops, user specified weird page size, and we overflowed!
 		 *  Trim it back so we don't wrap the address space.
 		 */
-		newpage->end = ULONG_MAX;
+		newpage->end = UINT32_MAX;
 	}
 	newpage->chunkList = (Chunk *)NULL;
 	return (newpage);
@@ -345,7 +345,7 @@ void imageFree(Image *image)
  *  use as the most likely search starting point.  It will still work if this
  *  assumption isn't true, but will be slower.
  *==========================================================================*/
-void imageWrite(Image *image, LogicalAddr addr, size_t nbytes, uchar *data)
+void imageWrite(Image *image, LogicalAddr addr, size_t nbytes, uint8_t *data)
 {
 	Page    **pageLink;
 	Chunk   **chunkLink;
@@ -367,7 +367,7 @@ void imageWrite(Image *image, LogicalAddr addr, size_t nbytes, uchar *data)
 	}
 	if ( debug )
 	{
-		printf("imageWrite(): Saving %4d byte record. RecordAdd=%08lX-%08lX, skipBytes=%d\n",
+		printf("imageWrite(): Saving %4" FMT_SZ "d byte record. RecordAdd=%08X-%08" FMT_SZ "X, skipBytes=%d\n",
 			   nbytes, addr, addr+nbytes-1, image->skipBytes );
 	}
 	if ( image->skipBytes )
@@ -454,7 +454,7 @@ void imageWrite(Image *image, LogicalAddr addr, size_t nbytes, uchar *data)
  * Read 'nbytes' of data from image starting at addr into buffer.  Zero is
  * used to fill uninitialized areas.
  *==========================================================================*/
-void imageRead(Image *image, LogicalAddr addr, size_t nbytes, uchar *data)
+void imageRead(Image *image, LogicalAddr addr, size_t nbytes, uint8_t *data)
 {
 	Page    **pageLink;
 	Chunk   **chunkLink;
@@ -475,7 +475,7 @@ void imageRead(Image *image, LogicalAddr addr, size_t nbytes, uchar *data)
 	if ( !nbytes )
 	{
 		if ( debug )
-			printf("imageRead(): Looking for 0 byte image record starting at %08lX. Skipped search.\n", addr);
+			printf("imageRead(): Looking for 0 byte image record starting at %08X. Skipped search.\n", addr);
 		return;
 	}
 	if ( image->skipBytes )
@@ -493,7 +493,7 @@ void imageRead(Image *image, LogicalAddr addr, size_t nbytes, uchar *data)
 	 * the data into more than one section.
 	 */
 	if ( debug )
-		printf("imageRead(): Looking for %d byte image record starting at 0x%lX ...\n", nbytes, addr);
+		printf("imageRead(): Looking for %" FMT_SZ "d byte image record starting at 0x%X ...\n", nbytes, addr);
 	addrSave = addr;
 	while ( nbytes )
 	{
@@ -507,7 +507,7 @@ void imageRead(Image *image, LogicalAddr addr, size_t nbytes, uchar *data)
 			if ( debug )
 			{
 				if ( totalCopyLen )
-					printf("imageRead(): End of list. Copied %d bytes from 0x%lX-0x%lX\n", totalCopyLen, addrSave, addrSave + totalCopyLen - 1);
+					printf("imageRead(): End of list. Copied %" FMT_SZ "d bytes from 0x%X-0x%" FMT_SZ "X\n", totalCopyLen, addrSave, addrSave + totalCopyLen - 1);
 				else
 					printf("imageRead(): End of list. Copied 0 bytes\n");
 			}
@@ -527,7 +527,7 @@ void imageRead(Image *image, LogicalAddr addr, size_t nbytes, uchar *data)
 			if ( debug )
 			{
 				if ( totalCopyLen )
-					printf("imageRead(): End of list. Copied %d bytes from 0x%lX-0x%lX\n", totalCopyLen, addrSave, addrSave + totalCopyLen - 1);
+					printf("imageRead(): End of list. Copied %" FMT_SZ "d bytes from 0x%X-0x%" FMT_SZ "X\n", totalCopyLen, addrSave, addrSave + totalCopyLen - 1);
 				else
 					printf("imageRead(): End of list. Copied 0 bytes\n");
 			}
@@ -580,7 +580,7 @@ void imageRead(Image *image, LogicalAddr addr, size_t nbytes, uchar *data)
 	if ( debug )
 	{
 		if ( totalCopyLen )
-			printf("imageRead(): Copied %d bytes from 0x%lX-0x%lX\n", totalCopyLen, addrSave, addrSave + totalCopyLen - 1);
+			printf("imageRead(): Copied %" FMT_SZ "d bytes from 0x%X-0x%" FMT_SZ "X\n", totalCopyLen, addrSave, addrSave + totalCopyLen - 1);
 		else
 			printf("imageRead(): Copied 0 bytes\n");
 	}
@@ -596,7 +596,7 @@ void imageRead(Image *image, LogicalAddr addr, size_t nbytes, uchar *data)
  *  (1) image->symbolList points to the first record of a (possibly empty) 
  *  linked list ordered by symbol arrival order.  
  *==========================================================================*/
-void symbolWrite(Image *image, uchar *sym, int len)
+void symbolWrite(Image *image, uint8_t *sym, int len)
 {
 	Page    *pg;
 
@@ -628,9 +628,9 @@ void symbolWrite(Image *image, uchar *sym, int len)
 
 static Page     *curPage;
 static Chunk    *curChunk;
-static ulong    chunkBegin, chunkEnd;
-static ulong    chunkSize;
-static uchar    *chunkPtr;
+static uint32_t    chunkBegin, chunkEnd;
+static uint32_t    chunkSize;
+static uint8_t    *chunkPtr;
 
 /*==========================================================================*
  *  init_chunk_read - Initializes globals to read the given chunk.
@@ -641,7 +641,7 @@ static int init_chunk_read(Chunk *thisChunk)
 	chunkBegin  = curChunk->begin;              /* Save chunk's address range ... */
 	chunkEnd    = curChunk->end;
 	chunkSize   = chunkEnd - chunkBegin + 1;    /* ... and size */
-	chunkPtr    = (uchar *)curChunk->data;      /* and point to the data */
+	chunkPtr    = (uint8_t *)curChunk->data;      /* and point to the data */
 
 	return chunkSize != 0;
 
@@ -678,12 +678,12 @@ int init_reader(GPF *gpf)
  *      bytesRead   - Number of bytes returned in the buffer.
  *      returns     - 1 for success, 0 for no more bytes, -1 for errors.
  *==========================================================================*/
-int readImage(GPF *gpf, uchar *bufferPtr, ulong bufferSpace,
-			  ulong low_address, ulong high_address, ulong *new_low,
+int readImage(GPF *gpf, uint8_t *bufferPtr, uint32_t bufferSpace,
+			  uint32_t low_address, uint32_t high_address, uint32_t *new_low,
 			  int *bytesRead)
 {
-	uchar   fill = (uchar)(gpf->flags & GPF_M_FILL);
-	ulong   amount, startSpace;
+	uint8_t   fill = (uint8_t)(gpf->flags & GPF_M_FILL);
+	uint32_t   amount, startSpace;
 	int 	err, more_bytes;
 
 	/*
@@ -837,7 +837,7 @@ void imageDump(Image *image, FILE *dump)
 	int i, j, size, nchunk, npage;
 	char    buf[140];
 	char    *cp;
-	uchar   *data;
+	uint8_t   *data;
 
 	npage = 0;
 	for ( page = image->pageList; page; page = page->next )
@@ -849,7 +849,7 @@ void imageDump(Image *image, FILE *dump)
 			size = chunk->end - chunk->begin + 1;
 			fprintf(dump, "  chunk %d at %04lX-%04lX (%d bytes):\n", ++nchunk, chunk->begin, chunk->end, size);
 			i = 0 - (int)(chunk->begin & 0xF);
-			data = (uchar *)(chunk->data);
+			data = (uint8_t *)(chunk->data);
 			do
 			{
 				cp = buf;

@@ -27,7 +27,7 @@ M A C . C
 
 #include "mixit.h"
 
-extern ulong    last_address, base_address;
+extern uint32_t    last_address, base_address;
 extern char     current_fname[];
 
 /*==========================================================================*/
@@ -59,7 +59,7 @@ char *header[] = {
 /*==========================================================================
  * Puts out any header info for the file.
  *==========================================================================*/
-int PutHead_mac( FILE *file, ulong addr, ulong hi )
+int PutHead_mac( FILE *file, uint32_t addr, uint32_t hi )
 {
 	int i;
 
@@ -69,7 +69,7 @@ int PutHead_mac( FILE *file, ulong addr, ulong hi )
 		fprintf( file, "%s\n", header[i]);
 
 	base_address = addr;
-	last_address = (ulong)-1L;
+	last_address = (uint32_t)-1L;
 
 	return 1;
 
@@ -79,14 +79,14 @@ int PutHead_mac( FILE *file, ulong addr, ulong hi )
 /*==========================================================================*
  * Outputs a single record in MAC format.
  *==========================================================================*/
-int PutRec_mac( FILE *file, uchar *data, int recsize, ulong recstart )
+int PutRec_mac( FILE *file, uint8_t *data, int recsize, uint32_t recstart )
 {
 	int j;
 	char    *cp;
 	char    outbuf[140];
 
 	if (recstart != last_address)
-		fprintf( file, "\n\tROM_ORG %05lX %05lX\n",
+		fprintf( file, "\n\tROM_ORG %05X %05X\n",
 		base_address, recstart - base_address);
 	last_address = recstart + recsize;
 

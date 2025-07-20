@@ -301,7 +301,7 @@ int  lookup_token(char *token, ... )
 
   uppercase( token );
 
-	for( matches = count = 0; (list = va_arg(ap, char *)) != 0; ++count )
+	for( matches = count = 0; (list = va_arg(ap, char *)) != NULL; ++count )
 		{
                         if ( !strncmp(token, list, maxlen) )
   		        {

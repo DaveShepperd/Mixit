@@ -344,7 +344,13 @@
 				N="Makefile.linux"
 				Type="Makefile"/>
 			<F
-				N="Makefile.mingw32"
+				N="Makefile.linux-32"
+				Type="Makefile"/>
+			<F
+				N="Makefile.linux-noreadline"
+				Type="Makefile"/>
+			<F
+				N="Makefile.mingw"
 				Type="Makefile"/>
 			<F
 				N="Makefile.msys2"

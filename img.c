@@ -58,10 +58,10 @@ int GetRec_img(InRecord *rec)
 /*==========================================================================*
  * Outputs a single record in IMG format.
  *==========================================================================*/
-int PutRec_img( FILE *file, uchar *data, int recsize, ulong recstart )
+int PutRec_img( FILE *file, uint8_t *data, int recsize, uint32_t recstart )
 {
 #if defined(VMS)
-	uchar   buffer[512];
+	uint8_t   buffer[512];
 	int     amount;
 	while ( recsize > 0 )
 		{
@@ -79,7 +79,7 @@ int PutRec_img( FILE *file, uchar *data, int recsize, ulong recstart )
 		}
 #else
 	if ( debug )
-		printf("PutRec_img(): size=0x%X, pos=0x%08lX\n", recsize, recstart);
+		printf("PutRec_img(): size=0x%X, pos=0x%08X\n", recsize, recstart);
 	if ( fseek(file, recstart, SEEK_SET) < 0 )
 	    return perr_return( 0, "Error seeking to position in IMAGE file");
 	if (fwrite( data, recsize, 1, file) != 1) 

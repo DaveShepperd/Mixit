@@ -20,7 +20,7 @@ static int	qualbad(int input_parse, GPF *gpfp);
 extern char ttybuf[BUFSIZ], *ttp;   /* cmd buf & remainder ptr 				 */
 extern char token[BUFSIZ];      /* current token and its work pointer 	 */
 
-static ulong num;                   /* value found by numbad()|valbad() 	 */
+static uint32_t num;                   /* value found by numbad()|valbad() 	 */
 
 /* parsing constructs 					 */
 #define SYMNAM  "%256[A-Za-z0-9$_]"
@@ -180,7 +180,7 @@ static int addrbad(GPF *gpfp)     /* name was eaten, but not ':' or '=' 	 */
 
 			ttp = sig(ttp + strlen(token)); /* move on 					 */
 
-			switch (lookup_token(token, "START", "END", "OUTPUT", 0))
+			switch (lookup_token(token, "START", "END", "OUTPUT", NULL))
 			{
 			case 0:             /* START 								 */
 				gpfp->low_limit    = num;
@@ -252,7 +252,7 @@ static int typebad(int input_parse, GPF *gpfp)    /* slash already eaten */
 
 	switch (lookup_token(token, "LDA", "ROM", "MAC", "TEKHEX", "HEX",
 						 "MOSTECH", "VLDA", "IMAGE", "IMG", "ASM", "GNU",
-						 "INTEL", "MOTOROLA", "COFF", "ELF", "DIO", "CPE", 0))
+						 "INTEL", "MOTOROLA", "COFF", "ELF", "DIO", "CPE", NULL))
 	{
 	case 0:
 		gpfp->rec_type = GPF_K_LDA;
@@ -329,12 +329,12 @@ static int outqualbad(int input_parse, GPF *gpfp)     /* slash already eaten */
 	switch (lookup_token(token, "FILL", "MODE",
 						 "RECORDSIZE", "RECORD_SIZE", "NOSYMBOL",
 						 "WORDSIZE", "WORD_SIZE", "NOPAD",
-						 "EVEN_HALF", "ODD_HALF", 0))
+						 "EVEN_HALF", "ODD_HALF", NULL))
 	{
 	case 0: /* FILL */
 		if ( valbad('x') )
 			return 1;
-		gpfp->fill_char = (uchar)num;
+		gpfp->fill_char = (uint8_t)num;
 		gpfp->flags |= GPF_M_FILL;
 		if ( input_parse && (outgpf.flags & GPF_M_FILL) )
 		{
@@ -355,7 +355,7 @@ static int outqualbad(int input_parse, GPF *gpfp)     /* slash already eaten */
 
 		ttp = sig(ttp + strlen(token)); /* eat keyword */
 
-		switch (lookup_token(token, "WORD", "BYTE", 0))
+		switch (lookup_token(token, "WORD", "BYTE", NULL))
 		{
 		case 0:
 			/* WORD */  gpfp->flags |= GPF_M_WORD;
@@ -383,7 +383,7 @@ static int outqualbad(int input_parse, GPF *gpfp)     /* slash already eaten */
 	case 3: /* RECORD_SIZE */
 		if ( valbad('d') )
 			return 1;
-		gpfp->rec_size = (ushort)num;
+		gpfp->rec_size = (uint16_t)num;
 		break;
 
 	case 4: /* NOSYMBOL */
@@ -401,7 +401,7 @@ static int outqualbad(int input_parse, GPF *gpfp)     /* slash already eaten */
 			return isbad("MODE and WORD_SIZE cannot both be specified in OUTPUT commands");
 
 		gpfp->flags |= GPF_M_MAU;
-		gpfp->bits_per_word = (uchar)num;
+		gpfp->bits_per_word = (uint8_t)num;
 		if ( input_parse && (outgpf.flags & GPF_M_MAU) )
 		{
 			if ( outgpf.bits_per_word == num )
@@ -443,7 +443,7 @@ static int qualbad(int input_parse, GPF *gpfp)    /* slash already eaten */
 		return t;       /* 1 is bad, 0 is good */
 
 	switch (lookup_token(token, "ADDRESS", "GROUP", "SWAP",
-						 "WORDSIZE", "WORD_SIZE", 0))
+						 "WORDSIZE", "WORD_SIZE", NULL))
 	{
 	case 0: /* ADDRESS */
 		if ( input_parse )
@@ -457,7 +457,7 @@ static int qualbad(int input_parse, GPF *gpfp)    /* slash already eaten */
 			return 1;
 		if ( num & 7 )
 			return wasbad("GROUP must be a multiple of 8");
-		gpfp->group_code = (uchar)(num >> 3);    /* Make it a byte number */
+		gpfp->group_code = (uint8_t)(num >> 3);    /* Make it a byte number */
 		gpfp->flags |= GPF_M_GROUP;
 		break;
 
@@ -475,7 +475,7 @@ static int qualbad(int input_parse, GPF *gpfp)    /* slash already eaten */
 			return wasbad("WORD_SIZE must be a multiple of 8");
 
 		gpfp->flags |= GPF_M_MAU;
-		gpfp->bits_per_word = (uchar)num;
+		gpfp->bits_per_word = (uint8_t)num;
 		if ( input_parse && (outgpf.flags & GPF_M_MAU) )
 		{
 			if ( outgpf.bits_per_word == num )

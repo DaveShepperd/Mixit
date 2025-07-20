@@ -27,7 +27,7 @@ A S M . C
 
 #include "mixit.h"
 
-extern ulong    last_address, base_address;
+extern uint32_t    last_address, base_address;
 extern char     current_fname[];
 
 /*==========================================================================*/
@@ -40,14 +40,14 @@ int GetRec_asm(InRecord *rec)
 /*==========================================================================
  * Puts out any header info for the file.
  *==========================================================================*/
-int PutHead_asm( FILE *file, ulong addr, ulong hi )
+int PutHead_asm( FILE *file, uint32_t addr, uint32_t hi )
 {
 	if ( !noDate )
 		fprintf(file, "* File name = %s\n\n", current_fname);
 	fprintf( file, "MIXIT_BEGIN:\n");
 
 	base_address = addr;
-	last_address = (ulong)-1L;
+	last_address = -1;
 	return 1;
 
 } /* end PutHead_asm */
@@ -56,14 +56,14 @@ int PutHead_asm( FILE *file, ulong addr, ulong hi )
 /*==========================================================================*
  * Outputs a single record in ASM format.
  *==========================================================================*/
-int PutRec_asm( FILE *file, uchar *data, int recsize, ulong recstart )
+int PutRec_asm( FILE *file, uint8_t *data, int recsize, uint32_t recstart )
 {
 	int		j;
 	char    *cp;
 	char    outbuf[140];
 
 	if (recstart != last_address)
-		fprintf( file, "\n\t* EQU MIXIT_BEGIN + $%04lX + $%04lX\n",
+		fprintf( file, "\n\t* EQU MIXIT_BEGIN + $%04X + $%04X\n",
 		base_address, recstart - base_address);
 	last_address = recstart + recsize;
 

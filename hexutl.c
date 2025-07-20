@@ -20,7 +20,7 @@ H E X U T L . C
 /*
  * The following is for ASCII only.
  */
-uchar chartohex[] = {
+uint8_t chartohex[] = {
 	XX, XX, XX, XX,   XX, XX, XX, XX,   XX, XX, XX, XX,   XX, XX, XX, XX,
 	XX, XX, XX, XX,   XX, XX, XX, XX,   XX, XX, XX, XX,   XX, XX, XX, XX,
 	XX, XX, XX, XX,   XX, XX, XX, XX,   XX, XX, XX, XX,   XX, XX, XX, XX,
@@ -43,7 +43,7 @@ uchar chartohex[] = {
 };
 
 
-uchar   hex_of[] = {	'0', '1', '2', '3', '4', '5', '6', '7',
+uint8_t   hex_of[] = {	'0', '1', '2', '3', '4', '5', '6', '7',
 						'8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
 
 /*==========================================================================
@@ -51,9 +51,9 @@ uchar   hex_of[] = {	'0', '1', '2', '3', '4', '5', '6', '7',
  * Make sure all the chars are hexidecimal.
  *==========================================================================*/
 #define ERRMSG_SIZE (256)
-int strtobytes(uchar *inpStr, int nbytes)
+int strtobytes(uint8_t *inpStr, int nbytes)
 {
-	uchar *bytestr = inpStr, *str=inpStr;
+	uint8_t *bytestr = inpStr, *str=inpStr;
 	int i;
 	char errMsg[ERRMSG_SIZE];
 	int errCnt = 0;
@@ -106,9 +106,9 @@ int strtobytes(uchar *inpStr, int nbytes)
  * Convert ASCII hex string to binary hex nybbles (only 4 bits worth per byte).
  * Make sure all the chars are hexidecimal.
  *========================================================================*/
-int strtohex(uchar *inpStr, int nchars)
+int strtohex(uint8_t *inpStr, int nchars)
 {
-	uchar *str=inpStr;
+	uint8_t *str=inpStr;
 	int i;
 	char errMsg[ERRMSG_SIZE];
 	int errCnt = 0;
@@ -154,9 +154,9 @@ int strtohex(uchar *inpStr, int nchars)
 /*==========================================================================
  * Convert binary hex nybble string to bytes.
  *==========================================================================*/
-void hextobytes(uchar *hexstr, int nbytes)
+void hextobytes(uint8_t *hexstr, int nbytes)
 {
-	uchar *bytestr = hexstr;
+	uint8_t *bytestr = hexstr;
 	int i;
 
 	for (i = 0; i < nbytes; ++i) 
@@ -170,7 +170,7 @@ void hextobytes(uchar *hexstr, int nbytes)
 /*==========================================================================
  * Assemble big-endian byte stream into multi-byte logical addr.
  *==========================================================================*/
-LogicalAddr bytestoaddr(uchar *bytestr, int nbytes)
+LogicalAddr bytestoaddr(uint8_t *bytestr, int nbytes)
 {
 	LogicalAddr val = 0L;
 	int i;
@@ -192,7 +192,7 @@ LogicalAddr bytestoaddr(uchar *bytestr, int nbytes)
 /*==========================================================================
  * Assemble big-endian hex nybble stream into multi-byte logical addr.
  *==========================================================================*/
-LogicalAddr hextoaddr(uchar *hexstr, int nnybs)
+LogicalAddr hextoaddr(uint8_t *hexstr, int nnybs)
 {
 	LogicalAddr val = 0L;
 	int i;

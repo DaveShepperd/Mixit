@@ -43,8 +43,8 @@ Known bugs/features/limitations:
 int GetRec_dld(InRecord *rec)
 {
 	int		cnt, datacnt, chk, c;
-	uchar	*inbuf = rec->recBuf;
-	uchar	* lookahead,*bufend,*data;
+	uint8_t	*inbuf = rec->recBuf;
+	uint8_t	* lookahead,*bufend,*data;
 
 	if ( fgets((char *)inbuf, rec->recBufLen, rec->recFile) == NULL )
 	{
@@ -124,19 +124,19 @@ int GetRec_dld(InRecord *rec)
 /*==========================================================================*
  * Outputs a single record in DLD format.
  *==========================================================================*/
-int PutRec_dld(FILE *file, uchar *data, int recsize, ulong recstart)
+int PutRec_dld(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 {
 	int		j;
 	char	*cp;
 	char	outbuf[512];
-	uint	cksum;
+	uint32_t	cksum;
 #if 0
 	int		recbytes;
 
 	recbytes = recsize + 3;
 #endif
 	cp  = outbuf;
-	sprintf(cp, ";%02X%04lX", recsize, recstart & 0xFFFF);
+	sprintf(cp, ";%02X%04X", recsize, recstart & 0xFFFF);
 	cp += strlen(cp);
 
 	/* Append data to the record */

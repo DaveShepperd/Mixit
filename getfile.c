@@ -33,9 +33,9 @@ extern int fileno();        /* non-ANSI */
  *  save_data   - Deposits a record into an image after munging it based on
  *                various flag settings.
  *==========================================================================*/
-void save_data(InRecord *rec, LogicalAddr userLo, LogicalAddr userHi, long relocation, GPF *gpf)
+void save_data(InRecord *rec, LogicalAddr userLo, LogicalAddr userHi, int32_t relocation, GPF *gpf)
 {
-	size_t dataLen;
+	int32_t dataLen;
 	LogicalAddr startOffset;
 	
 	/* Record the address limits found in the input file */
@@ -49,7 +49,7 @@ void save_data(InRecord *rec, LogicalAddr userLo, LogicalAddr userHi, long reloc
 	{
 		if ( debug )
 		{
-			printf("save_data(): Skipped %4d byte input record. lo=0x%lX, hi=0x%lX, recordAdd=0x%lX-0x%lX (relocated=0x%lX-0x%lX)\n",
+			printf("save_data(): Skipped %4" FMT_SZ "d byte input record. lo=0x%X, hi=0x%X, recordAdd=0x%X-0x%X (relocated=0x%X-0x%X)\n",
 				   rec->recLen, userLo, userHi, rec->recSAddr, rec->recEAddr, rec->recSAddr+relocation, rec->recEAddr+relocation );
 		}
 		return;
@@ -69,9 +69,14 @@ void save_data(InRecord *rec, LogicalAddr userLo, LogicalAddr userHi, long reloc
 		dataLen = rec->recLen;
 	if ( debug )
 	{
-		printf("save_data(): Saving %4d byte relocated input record. RecordAdd=0x%lX-0x%lX, startOffset=%ld, relocated=0x%lX-0x%lX\n",
-			   dataLen, rec->recSAddr+startOffset, rec->recSAddr+dataLen-1, startOffset,
-			   rec->recSAddr+relocation+startOffset, rec->recSAddr+relocation+dataLen-1  );
+		printf("save_data(): Saving %4d byte relocated input record. RecordAdd=0x%X-0x%X, startOffset=%d, relocated=0x%X-0x%X\n",
+			   dataLen,
+			   rec->recSAddr+startOffset,
+			   rec->recSAddr+dataLen-1,
+			   startOffset,
+			   rec->recSAddr+relocation+startOffset,
+			   rec->recSAddr+relocation+dataLen-1
+			   );
 	}
 	imageWrite(&gpf->image, rec->recSAddr+relocation+startOffset, dataLen, rec->recData + startOffset);
 } /* end save_data */
@@ -95,8 +100,8 @@ int getfile(char *fname, GPF *gpf)
 	int         status;         /* Return status value */
 	int         reccnt;         /* Count of input records */
 	LogicalAddr lo, hi;			/* Low and high address range to get */
-	long		relocation;		/* offset to apply to addresses */
-	long	    flag;
+	int32_t		relocation;		/* offset to apply to addresses */
+	int32_t	    flag;
 	char        open_opt[] = "rb";
 	
 	memset(&rec,0,sizeof(rec));
@@ -116,7 +121,7 @@ int getfile(char *fname, GPF *gpf)
 	gpf->high_add	= 0;
 	gpf->low_add	= -1;
 	rec.recBufLen = DEFAULT_BUFLEN;
-	if ( (rec.recBuf = (uchar *)malloc(rec.recBufLen)) == NULL )
+	if ( (rec.recBuf = (uint8_t *)malloc(rec.recBufLen)) == NULL )
 		return err_return(0, "Not enough memory for input buffer");
 /*	rec.recLen = 0; */
 	itype = gpf->rec_type;

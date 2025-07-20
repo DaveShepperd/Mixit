@@ -1,5 +1,4 @@
-# This is for a 32 bit PiOS version (Debian 32 bit on a Raspberry Pi). Only test on a Pi5.
-# For now, macxx has to be built to run in 32 bit mode.
+# Only tested on a Pi5 running 32 bit O/S. It should build and run on either 32 or 64 bit.
 
 HOST_CPU = 
 DELIM = '

@@ -50,8 +50,8 @@ M O T . C
 int GetRec_mot(InRecord *rec)
 {
 	int 	cnt=0, datacnt, chk, c, addrlen;
-	uchar   *inbuf = rec->recBuf;
-	uchar   *lookahead, *bufend, *data;
+	uint8_t   *inbuf = rec->recBuf;
+	uint8_t   *lookahead, *bufend, *data;
 
 	do {
 	    if (fgets((char*)inbuf, rec->recBufLen, rec->recFile) == NULL) 
@@ -154,7 +154,7 @@ int GetRec_mot(InRecord *rec)
 } /* end GetRec_mot */
 
 /*==========================================================================*/
-char *to_hex( uchar value, char *str )
+char *to_hex( uint8_t value, char *str )
 {
 	*str++ = hex_of[(value >> 4) & 0x0F];
 	*str++ = hex_of[ value & 0x0F ];
@@ -175,12 +175,12 @@ int PutFoot_mot(FILE *file)
 /*==========================================================================*
  * Outputs a single record in MOT format.
  *==========================================================================*/
-int PutRec_mot( FILE *file, uchar *data, int recsize, ulong recstart )
+int PutRec_mot( FILE *file, uint8_t *data, int recsize, uint32_t recstart )
 {
 	int j;
 	char    *cp;
 	char    outbuf[512];
-	uint    cksum;
+	uint32_t    cksum;
 	int recbytes, type;
 
         if ((recstart&0xFFFF0000) == 0) type = 1;
@@ -188,7 +188,7 @@ int PutRec_mot( FILE *file, uchar *data, int recsize, ulong recstart )
         else type = 3;
 	recbytes = recsize + 2 + type;
 	cp  = outbuf;
-	sprintf(cp, "S%d%02X%0*lX", type, recbytes, (type-1)*2+4, recstart);
+	sprintf(cp, "S%d%02X%0*X", type, recbytes, (type-1)*2+4, recstart);
    	cp += strlen(cp);
 
 	/* Append data to the record */

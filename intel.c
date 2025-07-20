@@ -42,8 +42,8 @@ I N T E L . C
 int GetRec_intel(InRecord *rec)
 {
 	int		cnt, datacnt, chk, c;
-	uchar   *inbuf = rec->recBuf;
-	uchar   * lookahead,*bufend,*data;
+	uint8_t   *inbuf = rec->recBuf;
+	uint8_t   * lookahead,*bufend,*data;
 
 	if ( fgets((char *)inbuf, rec->recBufLen, rec->recFile) == NULL )
 	{
@@ -145,15 +145,15 @@ int PutFoot_intel(FILE *file)
 /*==========================================================================*
  * Outputs a single record in INTEL format.
  *==========================================================================*/
-int PutRec_intel(FILE *file, uchar *data, int recsize, ulong recstart)
+int PutRec_intel(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 {
 	int 	j;
 	char    *cp;
 	char    outbuf[512];
-	uint    cksum;
+	uint32_t    cksum;
 
 	cp  = outbuf;
-	sprintf(cp, ":%02X%04lX00", recsize, recstart & 0xFFFF);
+	sprintf(cp, ":%02X%04X00", recsize, recstart & 0xFFFF);
 	cp += strlen(cp);
 
 	/* Append data to the record */

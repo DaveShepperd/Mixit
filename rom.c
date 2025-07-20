@@ -81,7 +81,7 @@ typedef struct rom_rec
 {
 	char        start_address[40];
 	LogicalAddr end_address;
-	ulong       increment;
+	uint32_t       increment;
 	char        list[128][35];
 	int         count;
 	int         radix;
@@ -96,7 +96,7 @@ extern GPF          ingpf;  /* environment for getfile() / putfile() */
 extern LogicalAddr  base_address;
 extern char			current_fname[];
 
-static ulong	str_to_ul(char *str, int base);
+static uint32_t	str_to_ul(char *str, int base);
 static int	parse_token(char **str, char *value, const char *ok_chars);
 static int	parse_binary(char **str, char *value, int wildcards);
 static int	parse_hex(char **str, char *value, int wildcards);
@@ -108,9 +108,9 @@ static void	deposit_wild_data(RomRec *rrec);
 /*==========================================================================
  * Converts a string to a binary value.
  *==========================================================================*/
-static ulong str_to_ul(char *str, int base)
+static uint32_t str_to_ul(char *str, int base)
 {
-	ulong   value = 0;
+	uint32_t   value = 0;
 
 	if ( *str == BINARY_MARK )
 		if ( base && base != 2 )
@@ -248,7 +248,7 @@ static int parse_command(char *rec, RomRec *rrec)
 	i = *t;
 	*t = 0;
 	switch (lookup_token(rec, "BA", "BASE", "BSE", "SET", "WORDSIZE",
-						 "BIGENDIAN", "LITTLEENDIAN", 0))
+						 "BIGENDIAN", "LITTLEENDIAN", NULL))
 	{
 	case 0:     /* CHECK "BAA", "BAB", "BAC", "BAD", "BAE", "BAF", "BA" */
 	default:    /* DATA_COMMAND */
@@ -352,15 +352,15 @@ static void deposit_data(RomRec *rrec)
 {
 	LogicalAddr addrS, addrE;
 	LogicalAddr lo, hi;
-	long		relocation;
+	int32_t		relocation;
 	char        *item;
-	uchar       *ptr;
-	uchar       buffer[32];
-	long        flag;
-	ulong       increment;
+	uint8_t       *ptr;
+	uint8_t       buffer[32];
+	int32_t        flag;
+	uint32_t       increment;
 	int         sIdx, idx, lim, byteCnt;
 /*	short       group, group_code, swap; */
-	short       bytes_per_word;
+	int16_t       bytes_per_word;
 	InRecord    in_rec;
 
 	if ( !rrec->count )
@@ -395,13 +395,13 @@ static void deposit_data(RomRec *rrec)
 	if ( hi < addrS )
 	{
 		if ( debug )
-			printf("deposit_data(): Record out of range. addrS=0x%lX, addrE=0x%lX, lo=0x%lX, hi=0x%lX\n", addrS, addrE, lo, hi );
+			printf("deposit_data(): Record out of range. addrS=0x%X, addrE=0x%X, lo=0x%X, hi=0x%X\n", addrS, addrE, lo, hi );
 		return;     /* Out of range, skip it */
 	}
 	if ( lo > addrE )
 	{
 		if ( debug )
-			printf("deposit_data(): Record out of range. addrS=0x%lX, addrE=0x%lX, lo=0x%lX, hi=0x%lX\n", addrS, addrE, lo, hi );
+			printf("deposit_data(): Record out of range. addrS=0x%X, addrE=0x%X, lo=0x%X, hi=0x%X\n", addrS, addrE, lo, hi );
 		return;		/* Out of range, skip it */
 	}
 
@@ -411,7 +411,7 @@ static void deposit_data(RomRec *rrec)
 		ingpf.high_add = addrE;
 
 	if ( debug )
-		printf("deposit_data(): Entry before adjustments. addrS=0x%lX, addrE=0x%lX, rrec->count=%d, lo=0x%lX, hi=0x%lX, relocation=0x%lX\n",
+		printf("deposit_data(): Entry before adjustments. addrS=0x%X, addrE=0x%X, rrec->count=%d, lo=0x%X, hi=0x%X, relocation=0x%X\n",
 			   addrS, addrE, rrec->count, lo, hi, relocation);
 	sIdx = 0;
 	if ( rrec->end_address )
@@ -432,7 +432,7 @@ static void deposit_data(RomRec *rrec)
 		addrE = hi;
 	}
 	if ( debug )
-		printf("deposit_data(): Entry after adjustments. addrS=0x%lX, addrE=0x%lX, idx=%d, byteCnt=%d, lim=%d\n",
+		printf("deposit_data(): Entry after adjustments. addrS=0x%X, addrE=0x%X, idx=%d, byteCnt=%d, lim=%d\n",
 			   addrS, addrE, sIdx, byteCnt, lim);
 
 	while ( addrS <= addrE )
@@ -466,7 +466,7 @@ static void deposit_data(RomRec *rrec)
 					}
 					else
 					{
-						uchar hvalue = chartohex[*ptr];
+						uint8_t hvalue = chartohex[*ptr];
 						*item++ = (hvalue & 8) ? '1' : '0';
 						*item++ = (hvalue & 4) ? '1' : '0';
 						*item++ = (hvalue & 2) ? '1' : '0';
@@ -482,7 +482,7 @@ static void deposit_data(RomRec *rrec)
 			 */
 	
 			if ( debug )
-				printf("deposit_data(): calling imageRead(,0x%lX,%d,), addrS=0x%lX, lo=0x%lX, hi=0x%lX, idx=%d, lim=%d, relocation=0x%lX\n",
+				printf("deposit_data(): calling imageRead(,0x%X,%d,), addrS=0x%X, lo=0x%X, hi=0x%X, idx=%d, lim=%d, relocation=0x%X\n",
 					   addrS+relocation,
 					   rrec->word_size,
 					   addrS,
@@ -503,7 +503,7 @@ static void deposit_data(RomRec *rrec)
 			item += strlen(item) - 1;
 			for ( j = rrec->word_size - 1; j >= 0; --j )
 			{
-				uchar mask = 1;
+				uint8_t mask = 1;
 				int k, m = rrec->big_endian ? rrec->word_size - j - 1 : j;
 				for ( k = 0; k < 8; ++k )
 				{
@@ -527,7 +527,7 @@ static void deposit_data(RomRec *rrec)
 			in_rec.recSAddr = addrS;
 			in_rec.recEAddr = addrE;
 			if ( debug )
-				printf("deposit_data(): calling save_data(), lo=0x%lX, hi=0x%lX, addrS=0x%lX, addrE=0x%lX, byteCnt=%d, E-S=%ld, relocation=0x%lX\n",
+				printf("deposit_data(): calling save_data(), lo=0x%X, hi=0x%X, addrS=0x%X, addrE=0x%X, byteCnt=%d, E-S=%d, relocation=0x%X\n",
 					   lo, hi, addrS, addrE, byteCnt, addrE-addrS+1, relocation);
 			save_data(&in_rec, lo, hi, relocation, &ingpf);
 	#else
@@ -631,14 +631,14 @@ int GetRec_rom(InRecord *rec)
 /*==========================================================================*
  * Outputs a single record in ROM format.
  *==========================================================================*/
-int PutRec_rom(FILE *file, uchar *data, int recsize, ulong recstart)
+int PutRec_rom(FILE *file, uint8_t *data, int recsize, uint32_t recstart)
 {
 	int j;
 
 	if ( recsize <= 0 )
 		return 1;
 	/* Output the Address and the 1st byte */
-	fprintf(file, "%04lX=%02X", recstart, *data++);
+	fprintf(file, "%04X=%02X", recstart, *data++);
 	/* Append data to the record */
 	for ( j = 1; j < recsize; ++j )
 		fprintf(file, ",%02X", *data++);
@@ -651,7 +651,7 @@ int PutRec_rom(FILE *file, uchar *data, int recsize, ulong recstart)
 /*==========================================================================
  * Puts out any header info for the file.
  *==========================================================================*/
-int PutHead_rom(FILE *file, ulong addr, ulong hi)
+int PutHead_rom(FILE *file, uint32_t addr, uint32_t hi)
 {
 	if ( !noDate )
 	{
