@@ -263,6 +263,7 @@ int putfile(char *fname, GPF *gpf)
 	uint32_t	rMax;
 	uint8_t	*buffer;
 	LogicalAddr	lo_range, hi_range, lo_ask, lo;
+	static const LogicalAddr MaxAddr = -2;
 	static	uint32_t		rec_count;
 	LogicalAddr inpOffset;
 	LogicalAddr outAddr;
@@ -516,7 +517,7 @@ int putfile(char *fname, GPF *gpf)
 			break;
 	}
 /* Only image and DIO files require padding */
-	if ( !(gpf->flags & GPF_M_NOPAD) && (gpf->rec_type == GPF_K_IMG || gpf->rec_type == GPF_K_DIO) && rBytes && hi_range < -2 && lo_ask <= hi_range )
+	if ( !(gpf->flags & GPF_M_NOPAD) && (gpf->rec_type == GPF_K_IMG || gpf->rec_type == GPF_K_DIO) && rBytes && hi_range < MaxAddr && lo_ask <= hi_range )
 	{
 		lo_ask = (lo_ask - lo_range) / gpf->bytes_per_word + gpf->out_add;
 		hi_range = (hi_range - lo_range) / gpf->bytes_per_word + gpf->out_add;
