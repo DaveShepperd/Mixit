@@ -123,6 +123,8 @@ int getfile(char *fname, GPF *gpf)
 	rec.recBufLen = DEFAULT_BUFLEN;
 	if ( (rec.recBuf = (uint8_t *)malloc(rec.recBufLen)) == NULL )
 		return err_return(0, "Not enough memory for input buffer");
+	if ( (rec.tmpBuf = (char *)malloc(rec.recBufLen)) == NULL )
+		return err_return(0, "Not enough memory for temp input buffer");
 /*	rec.recLen = 0; */
 	itype = gpf->rec_type;
 	if ( itype == GPF_K_UNKNOWN )
@@ -223,5 +225,6 @@ int getfile(char *fname, GPF *gpf)
 	}
 	fclose(rec.recFile);
 	free(rec.recBuf);
+	free(rec.tmpBuf);
 	return (status == -1);
 } /* end getfile */

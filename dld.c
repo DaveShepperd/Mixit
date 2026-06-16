@@ -42,34 +42,50 @@ Known bugs/features/limitations:
 /*==========================================================================*/
 int GetRec_dld(InRecord *rec)
 {
-	int		cnt, datacnt, chk, c;
+	int		cnt, datacnt, c;
+	uint16_t chk, cksum;
+	char	*lookahead, *tmpBufend, *tmpBuf = rec->tmpBuf;
 	uint8_t	*inbuf = rec->recBuf;
-	uint8_t	* lookahead,*bufend,*data;
-
-	if ( fgets((char *)inbuf, rec->recBufLen, rec->recFile) == NULL )
+	uint8_t	*bufend,*data;
+	
+	if ( fgets(tmpBuf, rec->recBufLen, rec->recFile) == NULL )
 	{
 		rec->recLen = 0;
-		return (rec->recType = feof(rec->recFile) ? REC_EOF : REC_ERR);
+		if ( !feof(rec->recFile) )
+		{
+#if LINUX
+			moan("dld.c: error reading record: %s", strerror(errno));
+#else
+			moan("dld.c: error %d reading record", errno);
+#endif
+			return (rec->recType = REC_ERR);
+		}
+		return (rec->recType = REC_EOF);
 	}
 
 	/*	Convert to 'pure' hexidecimal record:  purge everything until a ';',
 	 *	squeeze out junk, and quit when you find end of record.
 	 */
 
-	lookahead = bufend = inbuf;
+	lookahead = tmpBufend = tmpBuf;
 	c = 0;
 	while ( *lookahead != 0 )
 	{
 		if ( c )
 		{
-			if ( isxdigit(*bufend = *lookahead) )
-				++bufend;
+			if ( isxdigit(*tmpBufend = *lookahead) )
+				++tmpBufend;
 		}
 		else if ( *lookahead == ';' )
 			c = 1;
+		if ( *lookahead == '\n' )
+		{
+			*tmpBufend = 0;
+			break;
+		}
 		++lookahead;
 	}
-	if ( (cnt = bufend - inbuf) == 0 )
+	if ( (cnt = tmpBufend - tmpBuf) == 0 )
 	{
 		rec->recLen = 0;
 		return (rec->recType = REC_UNKNOWN)/* empty line */;
@@ -79,46 +95,58 @@ int GetRec_dld(InRecord *rec)
 	/* Convert to byte string. */
 
 	SHOW( *bufend = 0;
-		 fputs((char *)inbuf, errFile);
+		 fputs(tmpBuf, errFile);
 		 putc('\n', errFile);
 		)
-	strtobytes(inbuf, cnt);
+	/* Convert 'cnt' bytes of inbuf from ASCII hex to binary */
+	if ( strtobytes2(inbuf, tmpBuf, cnt) )
+	{
+		SHOW( fprintf(errFile,"dld.c: Record syntax error-> ;%s\n", tmpBuf) )
+		rec->recLen = 0;
+		return (rec->recType = REC_UNKNOWN);
+	}
 	bufend = inbuf + cnt;
 	SHOW(	for ( data = inbuf; data < bufend; ++data )
-			 fprintf(errFile, "%.2X", *data);
+			 fprintf(errFile, "%02X", *data);
 		 putc('\n', errFile);
 		 )
 	/* Get count, addr, and record type. */
 
 	datacnt = inbuf[0];
 	rec->recSAddr = bytestoaddr(&inbuf[1], 2);
-	SHOW( fprintf(errFile, "addr = %.4X\n", rec->recSAddr);
+	SHOW( fprintf(errFile, "addr = %04X\n", rec->recSAddr);
 		 )
 
 	/* Verify record length and checksum. */
 
 	if ( datacnt > cnt - 5 /* 1-byte count, 2-byte addr, 2-bytes chksum */ )
 	{
-		moan("Record length error (sez %d, is %d)", datacnt, cnt - 5);
+		moan("dld.c: Record length error (sez %d, is %d)-> ;%s", datacnt, cnt - 5, tmpBuf);
 		rec->recLen = 0;
 		return (rec->recType = REC_ERR);
 	}
 	chk = 0;
 	for ( data = inbuf; data < bufend - 2; ++data )
 		chk += *data;
-	SHOW( fprintf(errFile, "chk = 0x%.2X\n", chk);
+	SHOW( fprintf(errFile, "chk = 0x%04X\n", chk);
 		 )
-	if ( (LogicalAddr)(chk & 0xFFFF) != bytestoaddr(bufend - 2, 2) )
+	cksum = bytestoaddr(bufend - 2, 2);
+	if ( chk != cksum )
 	{
-		moan("Checksum error");
-		rec->recLen = 0;
-		return (rec->recType = REC_ERR);
+		if ( datacnt )
+		{
+			moan("dld(): checksum error. Record has 0x%04X, computed 0x%04X-> ;%s", cksum, chk, tmpBuf);
+			rec->recLen = 0;
+			return (rec->recType = REC_ERR);
+		}
 	}
 	rec->recLen = datacnt;
 	rec->recData = inbuf + 3 /* skip header */;
-	rec->recEAddr = rec->recSAddr+datacnt-1;
-	return (rec->recType = datacnt ? REC_DATA : REC_UNKNOWN /* EOF record */);
-
+	if ( datacnt )
+		rec->recEAddr = rec->recSAddr + datacnt - 1;
+	else
+		rec->recEAddr = rec->recSAddr;
+	return (rec->recType = datacnt ? REC_DATA : REC_XFER);
 } /* end GetRec_dld */
 
 /*==========================================================================*

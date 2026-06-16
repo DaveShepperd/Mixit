@@ -11,6 +11,7 @@
 #endif
 #if LINUX
 #include <unistd.h>
+#include <errno.h>
 #endif
 
 #include "formats.h"

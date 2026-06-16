@@ -51,9 +51,10 @@ uint8_t   hex_of[] = {	'0', '1', '2', '3', '4', '5', '6', '7',
  * Make sure all the chars are hexidecimal.
  *==========================================================================*/
 #define ERRMSG_SIZE (256)
-int strtobytes(uint8_t *inpStr, int nbytes)
+int strtobytes2(uint8_t *dst, const char *src, int nbytes)
 {
-	uint8_t *bytestr = inpStr, *str=inpStr;
+	uint8_t *bytestr = dst;
+	const char *str = src;
 	int i;
 	char errMsg[ERRMSG_SIZE];
 	int errCnt = 0;
@@ -66,11 +67,11 @@ int strtobytes(uint8_t *inpStr, int nbytes)
 		if ( msb == XX || lsb == XX )
 		{
 			int ii;
-			errCnt = snprintf(errMsg, ERRMSG_SIZE, "strtobytes(): Not hex digit at str[%d] of len %d '", i, nbytes*2);
+			errCnt = snprintf(errMsg, ERRMSG_SIZE, "strtobytes2(): Not hex digit at str[%d] of len %d '", i, nbytes*2);
 			for ( ii = 0; ii < i && errCnt < ERRMSG_SIZE - 18-4-4; ++ii )
 			{
-				errMsg[errCnt++] = hex_of[(inpStr[ii]>>4)&0xF];
-				errMsg[errCnt++] = hex_of[inpStr[ii]&0xF];
+				errMsg[errCnt++] = hex_of[(src[ii]>>4)&0xF];
+				errMsg[errCnt++] = hex_of[src[ii]&0xF];
 			}
 			if ( ii >= ERRMSG_SIZE-18-4-4 )
 				errCnt += snprintf(errMsg+errCnt,ERRMSG_SIZE-errCnt,"...'");
@@ -101,6 +102,10 @@ int strtobytes(uint8_t *inpStr, int nbytes)
 	return (0);
 } /* end strtobytes */
 
+int	strtobytes(uint8_t *str, int nbytes)
+{
+	return strtobytes2(str, (const char *)str, nbytes);
+}
 
 /*=========================================================================
  * Convert ASCII hex string to binary hex nybbles (only 4 bits worth per byte).

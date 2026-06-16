@@ -71,10 +71,10 @@ typedef struct inrecord
 	LogicalAddr recSAddr;	/* Start address of segment (inclusive) */
 	LogicalAddr	recEAddr;	/* End address of segment (inclusive) */
 	LogicalAddr recSegBase; /* segment offset for intel format (always 0 otherwise) */
-/*	int			beenConverted; */
-	uint8_t       *recBuf;
+	char		*tmpBuf;
+	uint8_t     *recBuf;
 	size_t      recBufLen;
-	uint8_t       *recData;
+	uint8_t     *recData;
 	size_t      recLen;
 	size_t		recConvertedLen;
 	int    	 	recType;
