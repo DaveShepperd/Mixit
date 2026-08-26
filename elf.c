@@ -122,7 +122,7 @@ static void flip_ph(Elf32_Phdr *nph, Elf32_Phdr *ph, int size)
 {
 	if ( ph != nph && nph != 0 )
 	{
-		memcpy((char *)nph->p_type, (char *)ph->p_type, size);
+		memcpy((uint8_t *)&nph->p_type, (uint8_t *)&ph->p_type, size);
 	}
 	else
 	{
@@ -305,7 +305,7 @@ int GetRec_elf(GPF *gpf, InRecord *rec, LogicalAddr lo, LogicalAddr hi, int32_t 
 			if ( (sts = fread(rec->recBuf, 1, len, rec->recFile)) != len )
 			{
 				char tmp[132];
-				sprintf(tmp, "Error reading section %d data. Wanted %d, got %d\n", ii, len, sts);
+				sprintf(tmp, "Error reading section %d data. Wanted %" FMT_PRFX "d, got %d\n", ii, len, sts);
 				perror(tmp);
 				goto clean_up;
 			}
